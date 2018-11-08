@@ -1,14 +1,9 @@
-
-
-
-from __future__ import unicode_literals
-
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
     SourceUser, SourceGroup, SourceRoom,
     TemplateSendMessage, ConfirmTemplate, MessageAction,
     ButtonsTemplate, ImageCarouselTemplate, ImageCarouselColumn, URIAction,
-    PostbackAction, DatetimePickerAction,
+    PostbackAction, DatetimePickerAction, PostbackTemplateAction,
     CameraAction, CameraRollAction, LocationAction,
     CarouselTemplate, CarouselColumn, PostbackEvent,
     StickerMessage, StickerSendMessage, LocationMessage, LocationSendMessage,
@@ -16,113 +11,116 @@ from linebot.models import (
     UnfollowEvent, FollowEvent, JoinEvent, LeaveEvent, BeaconEvent,
     FlexSendMessage, BubbleContainer, ImageComponent, BoxComponent,
     TextComponent, SpacerComponent, IconComponent, ButtonComponent,
-    SeparatorComponent, QuickReply, QuickReplyButton)
+    SeparatorComponent, QuickReply, QuickReplyButton
+)
 
-from linebot.models import TemplateSendMessage, CarouselTemplate, CarouselColumn, ButtonsTemplate, PostbackTemplateAction, MessageTemplateAction, URITemplateAction
+from image import *     #IM抓照片
 
-
-
-image_url_1 = "https://sdl-stickershop.line.naver.jp/stickershop/v1/sticker/60932570/android/sticker.png"
-image_url_2 = "https://stickershop.line-scdn.net/stickershop/v1/sticker/11482775/ANDROID/sticker.png"
-image_url_3 = "https://stickershop.line-scdn.net/stickershop/v1/product/9601/LINEStorePC/main@2x.png;compress=true"
-image_url_4 = "https://sdl-stickershop.line.naver.jp/stickershop/v1/sticker/11482762/android/sticker.png"
-image_url_5 = "https://stickershop.line-scdn.net/stickershop/v1/product/1040299/LINEStorePC/main@2x.png;compress=true"
-
-
-
-Normal1 = CarouselColumn(
-                    thumbnail_image_url=image_url_2,
+Quick = CarouselColumn(
+                    thumbnail_image_url=image_url_QC,
+                    title='Quick Check',
+                    text='若事況緊急，請直接填寫快速檢核！',
+                    actions=[
+                        PostbackTemplateAction(
+                            label='開始填寫',
+                            text='Quick Check',
+                            data='Quick'
+                        )
+                    ]
+                )
+Normal0 = CarouselColumn(
+                    thumbnail_image_url=image_url_N0,
                     title='Normal',
                     text='這是一般性檢查',
                     actions=[
                         PostbackTemplateAction(
                             label='開始填寫',
-                            #text='postback text1',
+                            text='Normal',
                             data='Normal'
                         )
                     ]
                 )
-Normal2 = CarouselColumn(
-                    thumbnail_image_url=image_url_2,
+Normal1 = CarouselColumn(
+                    thumbnail_image_url=image_url_N1,
                     title='Normal',
                     text='這是一般性檢查',
                     actions=[
                         PostbackTemplateAction(
                             label='已經填寫了~',
                             #text='postback text1',
-                            data=''
+                            data='已經填寫了~'
                         )
                     ]
                 )
-Indoors1 = CarouselColumn(
-                    thumbnail_image_url=image_url_2,
+Indoors0 = CarouselColumn(
+                    thumbnail_image_url=image_url_I0,
                     title='Indoors',
                     text='這是門/窗/牆/天花板/柱/地板',
                     actions=[
                         PostbackTemplateAction(
                             label='開始填寫',
-                            #text='postback text1',
+                            text='Indoors',
                             data='Indoors'
                         )
                     ]
                 )
-Indoors2 = CarouselColumn(
-                    thumbnail_image_url=image_url_2,
+Indoors1 = CarouselColumn(
+                    thumbnail_image_url=image_url_I1,
                     title='Indoors',
                     text='這是門/窗/牆/天花板/柱/地板',
                     actions=[
                         PostbackTemplateAction(
                             label='已經填寫了~',
                             #text='postback text1',
-                            data=''
+                            data='已經填寫了~'
                         )
                     ]
                 )
-Corridor1 = CarouselColumn(
-                    thumbnail_image_url=image_url_2,
+Corridor0 = CarouselColumn(
+                    thumbnail_image_url=image_url_C0,
                     title='Corridor',
                     text='這是欄杆/樓梯/走廊',
                     actions=[
                         PostbackTemplateAction(
                             label='開始填寫',
-                            #text='postback text1',
+                            text='Corridor',
                             data='Corridor'
                         )
                     ]
                 )
-Corridor2 = CarouselColumn(
-                    thumbnail_image_url=image_url_2,
+Corridor1 = CarouselColumn(
+                    thumbnail_image_url=image_url_C1,
                     title='Corridor',
                     text='這是欄杆/樓梯/走廊',
                     actions=[
                         PostbackTemplateAction(
                             label='已經填寫了~',
                             #text='postback text1',
-                            data=''
+                            data='已經填寫了~'
                         )
                     ]
                 )
-Outdoors1 = CarouselColumn(
-                    thumbnail_image_url=image_url_2,
+Outdoors0 = CarouselColumn(
+                    thumbnail_image_url=image_url_O0,
                     title='Outdoors',
                     text='這是地基/屋頂/管線/消防',
                     actions=[
                         PostbackTemplateAction(
                             label='開始填寫',
-                            #text='postback text1',
+                            text='Outdoors',
                             data='Outdoors'
                         )
                     ]
                 )
-Outdoors2 = CarouselColumn(
-                    thumbnail_image_url=image_url_2,
+Outdoors1 = CarouselColumn(
+                    thumbnail_image_url=image_url_O1,
                     title='Outdoors',
                     text='這是地基/屋頂/管線/消防',
                     actions=[
                         PostbackTemplateAction(
                             label='已經填寫了~',
                             #text='postback text1',
-                            data=''
+                            data='已經填寫了~'
                         )
                     ]
                 )

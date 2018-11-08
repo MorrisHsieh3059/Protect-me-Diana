@@ -1,27 +1,14 @@
-# -*- coding: utf-8 -*-
-
-#  Licensed under the Apache License, Version 2.0 (the "License"); you may
-#  not use this file except in compliance with the License. You may obtain
-#  a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-#  License for the specific language governing permissions and limitations
-#  under the License.
+##################################
+#########   Just Import  #########
+##################################
 
 from __future__ import unicode_literals
-
 import errno
 import os
 import sys
 import tempfile
 from argparse import ArgumentParser
-
 from flask import Flask, request, abort
-
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -33,7 +20,7 @@ from linebot.models import (
     SourceUser, SourceGroup, SourceRoom,
     TemplateSendMessage, ConfirmTemplate, MessageAction,
     ButtonsTemplate, ImageCarouselTemplate, ImageCarouselColumn, URIAction,
-    PostbackAction, DatetimePickerAction,
+    PostbackAction, DatetimePickerAction, PostbackTemplateAction,
     CameraAction, CameraRollAction, LocationAction,
     CarouselTemplate, CarouselColumn, PostbackEvent,
     StickerMessage, StickerSendMessage, LocationMessage, LocationSendMessage,
@@ -44,34 +31,36 @@ from linebot.models import (
     SeparatorComponent, QuickReply, QuickReplyButton
 )
 
+#from class_DB import DB              #DB抓問題(.filename)
+from extract_function import *       #RE抓數字
+from ct_push import *                #抓推播新的carousel template
+from confirm import *                #抓confirm template 進來
+from carousel import *               #抓caousel columns
+from confirm_push import *
+from next import *
+
 app = Flask(__name__)
 
-# get channel_secret and channel_access_token from your environment variable
-"""channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
-channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
-if channel_secret is None:
-    print('Specify LINE_CHANNEL_SECRET as environment variable.')
-    sys.exit(1)
-if channel_access_token is None:
-    print('Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.')
-    sys.exit(1)"""
+    ##################################
+    #########儲存使用者填答紀錄#########
+    ##################################
 
-line_bot_api = LineBotApi("apQkyD5cnxa8kanS8yfnr+ExfDR/yUoKmLXVu7epNzWsXqIoD1twn/YCGRnhIZLv4r36JYsjzVlpfWMHHaoTs9V4d/somxpkAI0ZNpiG8axYMp+xMbVvcC5vwyKEGizJWZ4CK1KX5DFqVxe5mb5lPgdB04t89/1O/w1cDnyilFU=", "http://localhost:8080")
-handler = WebhookHandler("e1af475f2498d7d75ecceca445f69bf7")
+data = {}
+result = True #True是預設為沒問題；False就改成待改進；詳情請看後續發展
+feedback = {} #使用者回饋
+EPD = 0 #絕對題號
 
-static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
+    ##################################
+    ##########  Good Simu   ##########
+    ##################################
 
+line_bot_api = None
+if os.environ.get("FLASK_ENV") == "development":
+    line_bot_api = LineBotApi(os.environ.get("TOKEN"), "http://localhost:8080")
+else:
+    line_bot_api = LineBotApi(os.environ.get("TOKEN"))
 
-# function for create tmp dir for download content
-def make_static_tmp_dir():
-    try:
-        os.makedirs(static_tmp_path)
-    except OSError as exc:
-        if exc.errno == errno.EEXIST and os.path.isdir(static_tmp_path):
-            pass
-        else:
-            raise
-
+handler = WebhookHandler(os.environ.get("SECRET"))
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -96,236 +85,100 @@ def callback():
     return 'OK'
 
 
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text_message(event):
     text = event.message.text
+    userid = event.source.user_id
 
-    if text == 'profile':
-        if isinstance(event.source, SourceUser):
-            profile = line_bot_api.get_profile(event.source.user_id)
+    feedback[userid] = []
+    global data
+
+    if text == 'carousel':
+        if userid not in data:#沒有USERID的話，add key(第一次填寫的時候) 然後推處死carousel
+            data[userid] = {"Quick":0, "Normal":0, "Indoors":0, "Corridor":0, "Outdoors":0, "Answered":[]}
+            ct_container = ct_push(data, userid)  #把4類別加進來
+            ct_container.insert(0, Quick)         #還沒填過，所以加進來qc
+            carousel_template = CarouselTemplate(columns=ct_container)
+            template_message = TemplateSendMessage(alt_text='災情回覆問卷', template=carousel_template)
+            line_bot_api.reply_message(event.reply_token, template_message)
+
+        elif data[userid]['Quick'] != 0:#QC填到一半智障又打一次carousel
             line_bot_api.reply_message(
-                event.reply_token, [
-                    TextSendMessage(text='Display name: ' + str(profile.display_name)),
-                    TextSendMessage(text='Status message: ' + str(profile.status_message))
-                ]
-            )
+                event.reply_token, TextSendMessage(text="您已選擇快速檢核！請填頁面上的最後一題"))
+
         else:
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text="Bot can't use profile API without user ID"))
-    elif text == 'bye':
-        if isinstance(event.source, SourceGroup):
-            line_bot_api.reply_message(
-                event.reply_token, TextSendMessage(text='Leaving group'))
-            line_bot_api.leave_group(event.source.group_id)
-        elif isinstance(event.source, SourceRoom):
-            line_bot_api.reply_message(
-                event.reply_token, TextSendMessage(text='Leaving group'))
-            line_bot_api.leave_room(event.source.room_id)
-        else:
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text="Bot can't leave from 1:1 chat"))
-    elif text == 'confirm':
-        confirm_template = ConfirmTemplate(text='Do it?', actions=[
-            MessageAction(label='Yes', text='Yes!'),
-            MessageAction(label='No', text='No!'),
-        ])
-        template_message = TemplateSendMessage(
-            alt_text='Confirm alt text', template=confirm_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
-    elif text == 'buttons':
-        buttons_template = ButtonsTemplate(
-            title='My buttons sample', text='Hello, my buttons', actions=[
-                URIAction(label='Go to line.me', uri='https://line.me'),
-                PostbackAction(label='ping', data='ping'),
-                PostbackAction(label='ping with text', data='ping', text='ping'),
-                MessageAction(label='Translate Rice', text='米')
-            ])
-        template_message = TemplateSendMessage(
-            alt_text='Buttons alt text', template=buttons_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
-    elif text == 'carousel':
-        carousel_template = CarouselTemplate(columns=[
-            CarouselColumn(text='hoge1', title='fuga1', actions=[
-                URIAction(label='Go to line.me', uri='https://line.me'),
-                PostbackAction(label='ping', data='ping')
-            ]),
-            CarouselColumn(text='hoge2', title='fuga2', actions=[
-                PostbackAction(label='ping with text', data='ping', text='ping'),
-                MessageAction(label='Translate Rice', text='米')
-            ]),
-        ])
-        template_message = TemplateSendMessage(
-            alt_text='Carousel alt text', template=carousel_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
-    elif text == 'image_carousel':
-        image_carousel_template = ImageCarouselTemplate(columns=[
-            ImageCarouselColumn(image_url='https://via.placeholder.com/1024x1024',
-                                action=DatetimePickerAction(label='datetime',
-                                                            data='datetime_postback',
-                                                            mode='datetime')),
-            ImageCarouselColumn(image_url='https://via.placeholder.com/1024x1024',
-                                action=DatetimePickerAction(label='date',
-                                                            data='date_postback',
-                                                            mode='date'))
-        ])
-        template_message = TemplateSendMessage(
-            alt_text='ImageCarousel alt text', template=image_carousel_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
-    elif text == 'imagemap':
-        pass
-    elif text == 'flex':
-        bubble = BubbleContainer(
-            direction='ltr',
-            hero=ImageComponent(
-                url='https://example.com/cafe.jpg',
-                size='full',
-                aspect_ratio='20:13',
-                aspect_mode='cover',
-                action=URIAction(uri='http://example.com', label='label')
-            ),
-            body=BoxComponent(
-                layout='vertical',
-                contents=[
-                    # title
-                    TextComponent(text='Brown Cafe', weight='bold', size='xl'),
-                    # review
-                    BoxComponent(
-                        layout='baseline',
-                        margin='md',
-                        contents=[
-                            IconComponent(size='sm', url='https://example.com/gold_star.png'),
-                            IconComponent(size='sm', url='https://example.com/grey_star.png'),
-                            IconComponent(size='sm', url='https://example.com/gold_star.png'),
-                            IconComponent(size='sm', url='https://example.com/gold_star.png'),
-                            IconComponent(size='sm', url='https://example.com/grey_star.png'),
-                            TextComponent(text='4.0', size='sm', color='#999999', margin='md',
-                                          flex=0)
-                        ]
-                    ),
-                    # info
-                    BoxComponent(
-                        layout='vertical',
-                        margin='lg',
-                        spacing='sm',
-                        contents=[
-                            BoxComponent(
-                                layout='baseline',
-                                spacing='sm',
-                                contents=[
-                                    TextComponent(
-                                        text='Place',
-                                        color='#aaaaaa',
-                                        size='sm',
-                                        flex=1
-                                    ),
-                                    TextComponent(
-                                        text='Shinjuku, Tokyo',
-                                        wrap=True,
-                                        color='#666666',
-                                        size='sm',
-                                        flex=5
-                                    )
-                                ],
-                            ),
-                            BoxComponent(
-                                layout='baseline',
-                                spacing='sm',
-                                contents=[
-                                    TextComponent(
-                                        text='Time',
-                                        color='#aaaaaa',
-                                        size='sm',
-                                        flex=1
-                                    ),
-                                    TextComponent(
-                                        text="10:00 - 23:00",
-                                        wrap=True,
-                                        color='#666666',
-                                        size='sm',
-                                        flex=5,
-                                    ),
-                                ],
-                            ),
-                        ],
-                    )
-                ],
-            ),
-            footer=BoxComponent(
-                layout='vertical',
-                spacing='sm',
-                contents=[
-                    # callAction, separator, websiteAction
-                    SpacerComponent(size='sm'),
-                    # callAction
-                    ButtonComponent(
-                        style='link',
-                        height='sm',
-                        action=URIAction(label='CALL', uri='tel:000000'),
-                    ),
-                    # separator
-                    SeparatorComponent(),
-                    # websiteAction
-                    ButtonComponent(
-                        style='link',
-                        height='sm',
-                        action=URIAction(label='WEBSITE', uri="https://example.com")
-                    )
-                ]
-            ),
-        )
-        message = FlexSendMessage(alt_text="hello", contents=bubble)
-        line_bot_api.reply_message(
-            event.reply_token,
-            message
-        )
-    elif text == 'quick_reply':
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(
-                text='Quick reply',
-                quick_reply=QuickReply(
-                    items=[
-                        QuickReplyButton(
-                            action=PostbackAction(label="label1", data="data1")
-                        ),
-                        QuickReplyButton(
-                            action=MessageAction(label="label2", text="text2")
-                        ),
-                        QuickReplyButton(
-                            action=DatetimePickerAction(label="label3",
-                                                        data="data3",
-                                                        mode="date")
-                        ),
-                        QuickReplyButton(
-                            action=CameraAction(label="label4")
-                        ),
-                        QuickReplyButton(
-                            action=CameraRollAction(label="label5")
-                        ),
-                        QuickReplyButton(
-                            action=LocationAction(label="label6")
-                        ),
-                    ])))
-    else:
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=event.message.text))
+            print(data[userid]['Normal'])
+            ct_container = ct_push(data, userid)
+            carousel_template = CarouselTemplate(columns=ct_container)
+            template_message = TemplateSendMessage(alt_text='問卷選單', template=carousel_template)
+            line_bot_api.reply_message(event.reply_token, template_message)
 
+    elif '已回覆待改進' not in text and '已回覆沒問題' not in text and 'Normal' not in text and 'Indoors' not in text and 'Corridor' not in text and 'Outdoors' not in text:
+        global result #就是要
+        global EPD
 
-@handler.add(MessageEvent, message=LocationMessage)
-def handle_location_message(event):
-    line_bot_api.reply_message(
-        event.reply_token,
-        LocationSendMessage(
-            title=event.message.title, address=event.message.address,
-            latitude=event.message.latitude, longitude=event.message.longitude
-        )
-    )
+        if result is False: #如果confirm templates 填待改進的話，他就會是 False
+            cat = ''
+            last = 0
+            ret = None #下一題的confirm
+            result = True #把值改回來
 
+            feedback[userid].append((EPD, text)) #紀錄(題號, 廢話)
+            data[userid]["Answered"].append(EPD)
+
+            if EPD in list(range(65,78)):
+                last = 77
+                cat = 'Quick'
+
+            elif EPD in list(range(1,13)):
+                last = 12
+                cat = 'Normal'
+
+            elif EPD in list(range(13,33)):
+                last = 32
+                cat = 'Indoors'
+
+            elif EPD in list(range(33,46)):
+                last = 45
+                cat = 'Corridor'
+
+            elif EPD in list(range(46,65)):
+                last = 64
+                cat = 'Outdoors'
+
+            if EPD == last:
+                data[userid][cat] += 1 #待改進填到最後一題+1
+                ct_container = ct_push(data, userid)
+
+                if EPD == 77 or ct_container == [Normal1, Indoors1, Corridor1, Outdoors1]:
+                    ret = [
+                        TextSendMessage(text="問卷已經填答完成咯～謝謝您的貢獻！"),
+                        StickerSendMessage(package_id=2,sticker_id=150),
+                    ]
+
+                else:
+                    carousel_template = CarouselTemplate(columns=ct_container)
+                    ret = [
+                    TemplateSendMessage(
+                        alt_text='問卷選單',
+                        template=carousel_template,
+                    )]
+
+            else:
+                data[userid][cat] += 1 #待改進沒填到最後一題+1
+                ret = [confirm(cat, data[userid][cat])]
+
+            line_bot_api.reply_message(
+                event.reply_token, [TextSendMessage(text='『' + text + '』已收到回覆')] + ret)
+    ##################################
+    ############## 貼圖 ##############
+    ##################################
 
 @handler.add(MessageEvent, message=StickerMessage)
 def handle_sticker_message(event):
+    userid = event.source.user_id
+
     line_bot_api.reply_message(
         event.reply_token,
         StickerSendMessage(
@@ -333,109 +186,78 @@ def handle_sticker_message(event):
             sticker_id=event.message.sticker_id)
     )
 
-
-# Other Message Type
-@handler.add(MessageEvent, message=(ImageMessage, VideoMessage, AudioMessage))
-def handle_content_message(event):
-    if isinstance(event.message, ImageMessage):
-        ext = 'jpg'
-    elif isinstance(event.message, VideoMessage):
-        ext = 'mp4'
-    elif isinstance(event.message, AudioMessage):
-        ext = 'm4a'
-    else:
-        return
-
-    message_content = line_bot_api.get_message_content(event.message.id)
-    with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
-        for chunk in message_content.iter_content():
-            tf.write(chunk)
-        tempfile_path = tf.name
-
-    dist_path = tempfile_path + '.' + ext
-    dist_name = os.path.basename(dist_path)
-    os.rename(tempfile_path, dist_path)
-
-    line_bot_api.reply_message(
-        event.reply_token, [
-            TextSendMessage(text='Save content.'),
-            TextSendMessage(text=request.host_url + os.path.join('static', 'tmp', dist_name))
-        ])
-
-
-@handler.add(MessageEvent, message=FileMessage)
-def handle_file_message(event):
-    message_content = line_bot_api.get_message_content(event.message.id)
-    with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix='file-', delete=False) as tf:
-        for chunk in message_content.iter_content():
-            tf.write(chunk)
-        tempfile_path = tf.name
-
-    dist_path = tempfile_path + '-' + event.message.file_name
-    dist_name = os.path.basename(dist_path)
-    os.rename(tempfile_path, dist_path)
-
-    line_bot_api.reply_message(
-        event.reply_token, [
-            TextSendMessage(text='Save file.'),
-            TextSendMessage(text=request.host_url + os.path.join('static', 'tmp', dist_name))
-        ])
-
-
-@handler.add(FollowEvent)
-def handle_follow(event):
-    line_bot_api.reply_message(
-        event.reply_token, TextSendMessage(text='Got follow event'))
-
-
-@handler.add(UnfollowEvent)
-def handle_unfollow():
-    app.logger.info("Got Unfollow event")
-
-
-@handler.add(JoinEvent)
-def handle_join(event):
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text='Joined this ' + event.source.type))
-
-
-@handler.add(LeaveEvent)
-def handle_leave():
-    app.logger.info("Got leave event")
-
+    ##################################
+    ##########Postback Event#########
+    ##################################
 
 @handler.add(PostbackEvent)
 def handle_postback(event):
-    if event.postback.data == 'ping':
+    userid = event.source.user_id#取得Userid
+
+    global result
+    global EPD
+
+    ##################################
+    ########## 填問卷的過程 ##########
+    ##################################
+
+    #QC丟問題，相對題號
+    if event.postback.data == 'Quick':
         line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text='pong'))
-    elif event.postback.data == 'datetime_postback':
+            event.reply_token, confirm("Quick",data[userid]['Quick']))
+
+    #四類丟問題，相對題號
+    elif event.postback.data in ['Normal', 'Indoors', 'Corridor', 'Outdoors']:
         line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=event.postback.params['datetime']))
-    elif event.postback.data == 'date_postback':
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=event.postback.params['date']))
+            event.reply_token, confirm_push(data, userid, event.postback.data))
 
+    #戳confirm template的時候
+    else:
+        parse = extract(event.postback.data) #[0]是絕對題號；[1]是OK/NO
+        ret = None
+        cat = ''
+        last = 0
 
-@handler.add(BeaconEvent)
-def handle_beacon(event):
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(
-            text='Got beacon event. hwid={}, device_message(hex string)={}'.format(
-                event.beacon.hwid, event.beacon.dm)))
+        if parse[0] in list(range(65,78)):
+            last = 77
+            cat = 'Quick'
 
+        elif parse[0] in list(range(1,13)):
+            last = 12
+            cat = 'Normal'
 
-if __name__ == "__main__":
-    arg_parser = ArgumentParser(
-        usage='Usage: python ' + __file__ + ' [--port <port>] [--help]'
-    )
-    arg_parser.add_argument('-p', '--port', type=int, default=8000, help='port')
-    arg_parser.add_argument('-d', '--debug', default=False, help='debug')
-    options = arg_parser.parse_args()
+        elif parse[0] in list(range(13,33)):
+            last = 32
+            cat = 'Indoors'
 
-    # create tmp dir for download content
-    make_static_tmp_dir()
+        elif parse[0] in list(range(33,46)):
+            last = 45
+            cat = 'Corridor'
 
-    app.run(debug=options.debug, port=options.port)
+        elif parse[0] in list(range(46,65)):
+            last = 64
+            cat = 'Outdoors'
+
+        #填完該類別最後一題且最後一題是沒問題
+        if parse[0] == last and parse[1] == 'OK':
+            data[userid][cat] += 1
+            ct_container = ct_push(data, userid)
+
+            #QC填完 or 全部都填過了
+            if parse[0] == 77 or ct_container == [Normal1, Indoors1, Corridor1, Outdoors1]:
+                ret = [
+                    TextSendMessage(text="問卷已經填答完成咯～謝謝您的貢獻！"),
+                    StickerSendMessage(package_id=2,sticker_id=150),
+                ]
+
+            #有類別沒填完
+            else:
+                carousel_template = CarouselTemplate(columns=ct_container)
+                ret = TemplateSendMessage(alt_text='問卷選單', template=carousel_template)
+
+        #待改進的話，或是非該類別的最後一題
+        else:
+            ret, result = next(data, userid, cat, parse)
+            EPD = parse[0] if result is False else EPD
+
+        line_bot_api.reply_message(event.reply_token, ret)
