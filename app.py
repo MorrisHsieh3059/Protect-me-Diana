@@ -38,6 +38,8 @@ from confirm import *                #抓confirm template 進來
 from carousel import *               #抓caousel columns
 from confirm_push import *
 from next import *
+from get_res_db import *
+
 
 app = Flask(__name__)
 
@@ -84,17 +86,18 @@ def callback():
 
     return 'OK'
 
-
-
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text_message(event):
     text = event.message.text
     userid = event.source.user_id
 
-    feedback[userid] = []
     global data
+    global feedback
 
     if text == 'carousel':
+        if userid not in feedback:
+            feedback[userid] = []
+
         if userid not in data:#沒有USERID的話，add key(第一次填寫的時候) 然後推處死carousel
             data[userid] = {"Quick":0, "Normal":0, "Indoors":0, "Corridor":0, "Outdoors":0, "Answered":[]}
             ct_container = ct_push(data, userid)  #把4類別加進來
@@ -113,6 +116,16 @@ def handle_text_message(event):
             carousel_template = CarouselTemplate(columns=ct_container)
             template_message = TemplateSendMessage(alt_text='問卷選單', template=carousel_template)
             line_bot_api.reply_message(event.reply_token, template_message)
+
+#    elif text == "" :
+#        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='謝謝學姊拯救我們XDD        '))
+#        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='幫我們架設遠端的dokku伺服器'))
+#        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='每個禮拜五(一四六)都被我們煩'))
+#        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='還教我們把白話文變文言文XDD '))
+#        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='也謝謝 Pecu 給我們這樣的機會'))
+#        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='我們的報告到此結束         '))
+#        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='謝 ~ 謝 ~ 大 ~ 家        '))
+
 
     elif '已回覆待改進' not in text and '已回覆沒問題' not in text and 'Normal' not in text and 'Indoors' not in text and 'Corridor' not in text and 'Outdoors' not in text:
         global result #就是要
@@ -152,6 +165,9 @@ def handle_text_message(event):
                 ct_container = ct_push(data, userid)
 
                 if EPD == 77 or ct_container == [Normal1, Indoors1, Corridor1, Outdoors1]:
+                    output = feedback.pop(userid) #填完了消滅它
+                    data.pop(userid)
+                    get_feedback(output, userid, EPD == 77)
                     ret = [
                         TextSendMessage(text="問卷已經填答完成咯～謝謝您的貢獻！"),
                         StickerSendMessage(package_id=2,sticker_id=150),
@@ -171,6 +187,7 @@ def handle_text_message(event):
 
             line_bot_api.reply_message(
                 event.reply_token, [TextSendMessage(text='『' + text + '』已收到回覆')] + ret)
+
     ##################################
     ############## 貼圖 ##############
     ##################################
@@ -204,7 +221,7 @@ def handle_postback(event):
     #QC丟問題，相對題號
     if event.postback.data == 'Quick':
         line_bot_api.reply_message(
-            event.reply_token, confirm("Quick",data[userid]['Quick']))
+            event.reply_token, confirm_push(data, userid, event.postback.data))
 
     #四類丟問題，相對題號
     elif event.postback.data in ['Normal', 'Indoors', 'Corridor', 'Outdoors']:
@@ -245,6 +262,9 @@ def handle_postback(event):
 
             #QC填完 or 全部都填過了
             if parse[0] == 77 or ct_container == [Normal1, Indoors1, Corridor1, Outdoors1]:
+                output = feedback.pop(userid) #填完了消滅它
+                data.pop(userid)
+                get_feedback(output, userid, parse[0] == 77)
                 ret = [
                     TextSendMessage(text="問卷已經填答完成咯～謝謝您的貢獻！"),
                     StickerSendMessage(package_id=2,sticker_id=150),

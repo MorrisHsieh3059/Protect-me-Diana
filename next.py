@@ -16,7 +16,6 @@ from linebot.models import (
 
 from confirm import *                #抓confirm template 進來
 
-
 def next(data, userid, cat, parse):
 
         if parse[0] in data[userid]["Answered"]:
