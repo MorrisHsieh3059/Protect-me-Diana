@@ -100,6 +100,15 @@ def handle_text_message(event):
     global revise_result
     global revise_EPD
 
+    if text == '請給我使用須知':
+        ret1 = "歡迎使用本平台😁\n本平台是作為學校校安機關的安全檢核系統\n目前功能僅有表單檢核功能"
+        ret2 = "【填寫表單須知】：\n您可以透過點選選單中的問卷按鈕，或是輸入「問卷」來呼叫問卷。\n本問卷提供兩種填答方式：\n\n1.快速檢核：若情況緊急，請使用此捷徑\n2.常規問卷：共分成四類選單，可交叉填答\n【注意】：兩種填寫方式不可交叉填寫"
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text=ret1))
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text=ret2))
+
+
     if text == '請給我表單填寫':
         if userid not in feedback:
             feedback[userid] = []
@@ -331,7 +340,7 @@ def handle_postback(event):
         if event.postback.data == 'edit=OK':
             ret = [
             TextSendMessage(text="請問您要修改哪一題呢?"),
-            TextSendMessage(text="請按照下列格式填寫，例如：\nNormal Q7"),
+            TextSendMessage(text="【注意】：當您填寫快速檢核時，不能修改其他四類問題；反之亦然。\n\n請按照下列格式填寫，例如：\nNormal Q7"),
             ]
             line_bot_api.reply_message(event.reply_token, ret)
 
