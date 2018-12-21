@@ -39,6 +39,7 @@ from carousel import *               #抓caousel columns
 from confirm_push import *
 from next import *
 from get_res_db import *
+from get_account_db import *
 from tempview import *
 from converter import *
 from revise import *
@@ -55,6 +56,9 @@ revise_result = True #不要懷疑就是有
 feedback = {} #使用者回饋
 EPD = 0 #填問卷的時候的絕對題號
 revise_EPD = 0
+parse_no = 0 #從填寫confirm template的時候，抓出相對題號
+account = {} #帳號設定問問題用的
+account_q = 0 #記住帳號設定的題數
 
     ##################################
     ##########  Good Simu   ##########
@@ -63,6 +67,9 @@ revise_EPD = 0
 line_bot_api = None
 if os.environ.get("FLASK_ENV") == "development":
     line_bot_api = LineBotApi(os.environ.get("TOKEN"), "http://localhost:8080")
+
+#區分成本機用的跟遠端server用的資料庫
+#EX:本機是MYSQL 雲端是POSTGRE
 else:
     line_bot_api = LineBotApi(os.environ.get("TOKEN"))
 
@@ -90,6 +97,8 @@ def callback():
 
     return 'OK'
 
+
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text_message(event):
     text = event.message.text
@@ -99,22 +108,25 @@ def handle_text_message(event):
     global feedback
     global revise_result
     global revise_EPD
+    global account
+    global account_q
 
     if text == '請給我使用須知':
-        ret1 = "歡迎使用本平台😁\n本平台是作為學校校安機關的安全檢核系統\n目前功能僅有表單檢核功能"
-        ret2 = "【填寫表單須知】：\n您可以透過點選選單中的問卷按鈕，或是輸入「問卷」來呼叫問卷。\n本問卷提供兩種填答方式：\n\n1.快速檢核：若情況緊急，請使用此捷徑\n2.常規問卷：共分成四類選單，可交叉填答\n【注意】：兩種填寫方式不可交叉填寫"
+        ret1 = TextSendMessage(text="歡迎使用本平台😁\n本平台是作為學校校安機關的安全檢核系統\n目前功能僅有表單檢核功能")
+        ret2 = TextSendMessage(text="【填寫表單須知】：\n您可以透過點選選單中的問卷按鈕，或是輸入「問卷」來呼叫問卷。\n本問卷提供兩種填答方式：\n\n1.快速檢核：若情況緊急，請使用此捷徑\n2.常規問卷：共分成四類選單，可交叉填答\n【注意】：兩種填寫方式不可交叉填寫")
+        ret3 = TextSendMessage(text="本次填寫的事件為："+str(get_latest_assessment_id_db()[1]))
         line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=ret1))
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=ret2))
+            event.reply_token, [ret1] + [ret2] + [ret3])
 
+
+    if text == '我要統計資料':
+        ret = TextSendMessage(text="此功能尚待開發唷")
+        line_bot_api.reply_message(event.reply_token, ret)
 
     if text == '請給我表單填寫':
-        if userid not in feedback:
-            feedback[userid] = []
-
         if userid not in data:#沒有USERID的話，add key(第一次填寫的時候) 然後推處死carousel
             data[userid] = {"Quick":0, "Normal":0, "Indoors":0, "Corridor":0, "Outdoors":0, "Answered":[]}
+            feedback[userid] = []
             ct_container = ct_push(data, userid)  #把4類別加進來
             carousel_template = CarouselTemplate(columns=ct_container)
             template_message = TemplateSendMessage(alt_text='災情回覆問卷', template=carousel_template)
@@ -202,6 +214,7 @@ def handle_text_message(event):
                 if no != feedback[userid][j][0]:
                     newlist.append(feedback[userid][j])
             feedback[userid] = newlist
+
             #丟confirm
             ret = [revise_confirm(cat, i)]
             data[userid]["Answered"].append(no)#加入已填答
@@ -229,6 +242,38 @@ def handle_text_message(event):
                 event.reply_token, [TextSendMessage(text='『' + text + '』已收到回覆')] + ret)
 
 
+    if text == '我要設定帳號':
+        if userid in get_userid_db(): #已經填過了，問她要不要再改
+            line_bot_api.reply_message(
+                event.reply_token, account_confirm())
+        elif userid not in get_userid_db(): #第一次設
+            account[userid] = {'userid':userid, 'name':0, 'county':0, 'school':0, 'phone':0}
+            ret1 = TextSendMessage(text="【注意】：請一次設定完成")
+            ret2 = TextSendMessage(text="請問您尊姓大名？")
+            line_bot_api.reply_message(event.reply_token, [ret1 + ret2])
+            account_q = 1
+    elif account_q == 1:
+        account[userid]['name'] = text
+        ret = TextSendMessage(text="請問您的所在縣市？")
+        line_bot_api.reply_message(event.reply_token, ret)
+        account_q += 1
+    elif account_q == 2:
+        account[userid]['county'] = text
+        ret = TextSendMessage(text="請問您所在學校名稱為何？")
+        line_bot_api.reply_message(event.reply_token, ret)
+        account_q += 1
+    elif account_q == 3:
+        account[userid]['school'] = text
+        ret = TextSendMessage(text="請問您的連絡電話？")
+        line_bot_api.reply_message(event.reply_token, ret)
+        account_q += 1
+    elif account_q == 4:
+        account[userid]['phone'] = text
+        ret = TextSendMessage(text="謝謝您的填答，您的身分已確認😁😁")
+        line_bot_api.reply_message(event.reply_token, ret)
+        get_account_db(account[userid])
+        account_q = 0
+
 
     #################################
     ############## 貼圖 ##############
@@ -252,11 +297,14 @@ def handle_sticker_message(event):
 @handler.add(PostbackEvent)
 def handle_postback(event):
     userid = event.source.user_id#取得Userid
-    parse_no = 0 #從填寫confirm template的時候，抓出相對題號
 
+    global parse_no
     global result
     global revise_result
     global EPD
+    global account
+    global account_q
+
     ##################################
     ########## 填問卷的過程 ##########
     ##################################
@@ -326,9 +374,10 @@ def handle_postback(event):
         line_bot_api.reply_message(event.reply_token, ret)
     except:
         if event.postback.data == 'edit=NO':
+
             output = feedback.pop(userid) #填完了消滅它
             data.pop(userid)
-            get_feedback(output, userid, parse_no == 77) #寫進資料庫
+            get_feedback(output, userid) #寫進資料庫
 
             ret = [
                 TextSendMessage(text="已收到您的回覆～謝謝您的貢獻！"),
@@ -348,12 +397,28 @@ def handle_postback(event):
     ########## 修改答案的過程 #########
     ##################################
 
-    if 'revise=' in event.postback.data and 'OK' in event.postback.data:#要改
+    if 'revise=' in event.postback.data and 'OK' in event.postback.data:#沒問題
         output = feedback[userid]
-        ret = tempview_confirm(output)#把它目前的回答推個confirm templatea給他看看
+        ret = tempview_confirm(output)#把它目前的回答推個confirm template給他看看
         line_bot_api.reply_message(event.reply_token, ret)
 
-    elif 'revise=' in event.postback.data and 'NO' in event.postback.data:#不要改
+    elif 'revise=' in event.postback.data and 'NO' in event.postback.data:#待改進
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text="請簡述災情"))
         revise_result = False
+
+    ##################################
+    ########## 重設帳號或不設 #########
+    ##################################
+
+    if event.postback.data == 'account_reset':
+
+        delete_userid_db(userid)
+        # account_q = 0
+        account[userid] = {'userid':userid, 'name':0, 'county':0, 'school':0, 'phone':0}
+        ret = TextSendMessage(text="請問您尊姓大名？")
+        line_bot_api.reply_message(event.reply_token, ret)
+        account_q += 1
+    elif event.postback.data == 'account_remain':
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text="好的，謝謝😁"))

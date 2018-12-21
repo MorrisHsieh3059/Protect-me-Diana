@@ -1,8 +1,26 @@
-
 import sqlite3
 
-def get_feedback(feedback, userid, quick):
+# 抓最新的assessment id
 
+def get_latest_assessment_id_db():
+
+    conn = sqlite3.connect('diana.db')
+    c = conn.cursor()
+
+    cursor = c.execute('SELECT * FROM assessment')
+
+    result = cursor.fetchall()
+    ret = result[len(result) - 1]
+
+    conn.commit()
+    conn.close()
+
+    return ret
+
+# 把feedback寫進db
+
+def get_feedback(feedback, userid):
+# def get_feedback(feedback, userid, location):
     #DB開關
     conn = sqlite3.connect('response.db')
     c = conn.cursor()
@@ -17,16 +35,18 @@ def get_feedback(feedback, userid, quick):
             assessment_id integer default 0,
             building_id integer default 0);""")
 
-
-
-    a = {i:None for i in range(65, 78)} if quick else {i:None for i in range(1, 65)}
+    # a = {i:None for i in range(65, 78)} if quick else {i:None for i in range(1, 65)}
+    a = {i:None for i in range(1, 78)}
 
     for i,value in feedback:
         a[i] = value
 
+
+    assessment_id = get_latest_assessment_id_db()[0]
+
     for i, value in a.items():
         yn = 1 if value is None else 0
-        c.execute('INSERT INTO responses (YN, description, userid, question_id) VALUES (?,?,?,?);', (yn, value, userid, i))
+        c.execute('INSERT INTO responses (YN, description, userid, question_id, assessment_id) VALUES (?,?,?,?,?);', (yn, value, userid, i, assessment_id))
 
     conn.commit()
     conn.close()

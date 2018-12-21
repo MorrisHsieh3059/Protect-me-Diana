@@ -8,6 +8,7 @@ flask = "*"
 line-bot-sdk = "*"
 honcho = "*"
 gunicorn = "*"
+psycopg2 = "*"
 
 [dev-packages]
 
