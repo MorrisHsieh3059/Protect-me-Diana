@@ -8,7 +8,7 @@ import os
 import sys
 import tempfile
 from argparse import ArgumentParser
-from flask import Flask, request, abort
+from flask import Flask, request, abort, jsonify
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -32,19 +32,27 @@ from linebot.models import (
 )
 
 #from class_DB import DB              #DB抓問題(.filename)
-from extract_function import *       #RE抓數字
-from ct_push import *                #抓推播新的carousel template
-from confirm import *                #抓confirm template 進來
-from carousel import *               #抓caousel columns
-from confirm_push import *
-from next import *
-from get_res_db import *
-from get_account_db import *
-from tempview import *
-from converter import *
-from revise import *
+from questionnaire.extract_function import extract, revise_extract       #RE抓數字
+from questionnaire.ct_push import ct_push               #抓推播新的carousel template
+from questionnaire.confirm import confirm, account_confirm            #抓confirm template 進來
+from questionnaire.carousel import *               #抓caousel columns
+from questionnaire.confirm_push import confirm_push
+from questionnaire.next import next
+from questionnaire.get_res_db import get_feedback
+from account.get_account_db import (
+    get_account_db, get_userid_db, delete_userid_db
+    , get_school_db, no_repeat_school_db, get_county_db
+)
+from questionnaire.tempview import takeFirst, tempview, tempview_confirm
+from questionnaire.converter import converter
+from questionnaire.revise import revise_idiot, revise_confirm, revise_able
+from connect.fetch import fetch
+from connect.detail import detail
+from connect.event import event
+from assessment.get_latest_assessment_id_db import get_latest_assessment_id_db
 
 app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False
 
     ##################################
     #########儲存使用者填答紀錄#########
@@ -74,6 +82,23 @@ else:
     line_bot_api = LineBotApi(os.environ.get("TOKEN"))
 
 handler = WebhookHandler(os.environ.get("SECRET"))
+
+@app.route('/event')
+def eventroute():
+    return jsonify(event())
+
+@app.route('/fetch')
+def fetchroute():
+    county = request.args.get('county')
+    ass_id  = request.args.get('assessment_id')
+    return jsonify(fetch('{"county":"' + county + '", "assessment_id":' + ass_id + '}'))
+
+@app.route('/detail')
+def detailroute():
+    userid = request.args.get('userid')
+    ass_id = request.args.get('assessment_id')
+    print(userid, ass_id)
+    return jsonify(detail('{"userid":"' + userid + '", "assessment_id":' + ass_id + '}'))
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -250,7 +275,7 @@ def handle_text_message(event):
             account[userid] = {'userid':userid, 'name':0, 'county':0, 'school':0, 'phone':0}
             ret1 = TextSendMessage(text="【注意】：請一次設定完成")
             ret2 = TextSendMessage(text="請問您尊姓大名？")
-            line_bot_api.reply_message(event.reply_token, [ret1 + ret2])
+            line_bot_api.reply_message(event.reply_token, [ret1] + [ret2])
             account_q = 1
     elif account_q == 1:
         account[userid]['name'] = text
@@ -259,36 +284,39 @@ def handle_text_message(event):
         account_q += 1
     elif account_q == 2:
         account[userid]['county'] = text
-        ret = TextSendMessage(text="請問您所在學校名稱為何？")
-        line_bot_api.reply_message(event.reply_token, ret)
-        account_q += 1
+        if text not in get_county_db():
+            ret = TextSendMessage(text="不好意思，您所輸入的縣市不在我國疆域。提醒您中華民國採用繁體中文😁\n【請重新設定帳戶】")
+            line_bot_api.reply_message(event.reply_token, ret)
+            account.pop(userid)
+            account_q = 0
+        else:
+            ret = TextSendMessage(text="請問您所在學校名稱為何？")
+            line_bot_api.reply_message(event.reply_token, ret)
+            account_q += 1
     elif account_q == 3:
         account[userid]['school'] = text
-        ret = TextSendMessage(text="請問您的連絡電話？")
-        line_bot_api.reply_message(event.reply_token, ret)
-        account_q += 1
+        if text not in get_school_db(account[userid]['county']):
+            ret = TextSendMessage(text="您的學校尚未與本平台合作，請聯絡我們")
+            line_bot_api.reply_message(event.reply_token, ret)
+            account.pop(userid)
+            account_q = 0
+        else:
+            if text in no_repeat_school_db(account[userid]['county']):
+                ret = TextSendMessage(text="您的學校已有負責人，請洽詢主管")
+                line_bot_api.reply_message(event.reply_token, ret)
+                account.pop(userid)
+                account_q = 0
+            else:
+                account_q += 1
+                ret = TextSendMessage(text="請問您的連絡電話？")
+                line_bot_api.reply_message(event.reply_token, ret)
     elif account_q == 4:
+        account_q = 0
         account[userid]['phone'] = text
         ret = TextSendMessage(text="謝謝您的填答，您的身分已確認😁😁")
         line_bot_api.reply_message(event.reply_token, ret)
         get_account_db(account[userid])
-        account_q = 0
-
-
-    #################################
-    ############## 貼圖 ##############
-    ##################################
-
-@handler.add(MessageEvent, message=StickerMessage)
-def handle_sticker_message(event):
-    userid = event.source.user_id
-
-    line_bot_api.reply_message(
-        event.reply_token,
-        StickerSendMessage(
-            package_id=event.message.package_id,
-            sticker_id=event.message.sticker_id)
-    )
+        print(account[userid])
 
     ##################################
     ##########Postback Event#########
@@ -372,7 +400,11 @@ def handle_postback(event):
             EPD = parse[0] if result is False else EPD
 
         line_bot_api.reply_message(event.reply_token, ret)
-    except:
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print(exc_type, fname, exc_tb.tb_lineno)
+
         if event.postback.data == 'edit=NO':
 
             output = feedback.pop(userid) #填完了消滅它
@@ -412,13 +444,11 @@ def handle_postback(event):
     ##################################
 
     if event.postback.data == 'account_reset':
-
         delete_userid_db(userid)
-        # account_q = 0
         account[userid] = {'userid':userid, 'name':0, 'county':0, 'school':0, 'phone':0}
         ret = TextSendMessage(text="請問您尊姓大名？")
         line_bot_api.reply_message(event.reply_token, ret)
-        account_q += 1
+        account_q = 1
     elif event.postback.data == 'account_remain':
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text="好的，謝謝😁"))

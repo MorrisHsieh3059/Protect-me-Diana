@@ -1,28 +1,14 @@
 import sqlite3
 
-# 抓最新的assessment id
-
-def get_latest_assessment_id_db():
-
-    conn = sqlite3.connect('diana.db')
-    c = conn.cursor()
-
-    cursor = c.execute('SELECT * FROM assessment')
-
-    result = cursor.fetchall()
-    ret = result[len(result) - 1]
-
-    conn.commit()
-    conn.close()
-
-    return ret
-
+from assessment.get_latest_assessment_id_db import get_latest_assessment_id_db
 # 把feedback寫進db
 
 def get_feedback(feedback, userid):
 # def get_feedback(feedback, userid, location):
     #DB開關
-    conn = sqlite3.connect('response.db')
+    conn = sqlite3.connect('response.db') 
+    # conn = psycopg2.connect("dbname=pmdianapg user=postgres host=hci.dianalab.net port=10710 password=" + os.environ.get("DBPASSWORD"))
+
     c = conn.cursor()
 
     #建response表格

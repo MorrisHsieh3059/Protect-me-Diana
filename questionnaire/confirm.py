@@ -14,7 +14,7 @@ from linebot.models import (
     SeparatorComponent, QuickReply, QuickReplyButton
 )
 
-from class_DB import DB              #DB抓問題
+from .class_DB import DB             #DB抓問題
 
 
 def confirm(cat, i):
