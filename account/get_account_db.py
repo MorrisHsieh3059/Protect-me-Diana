@@ -1,11 +1,8 @@
-import sqlite3
+def get_account_db(account, db):
+    
+    cur = db.conn.cursor()
 
-def get_account_db(account):
-
-    conn = sqlite3.connect('diana.db')
-    c = conn.cursor()
-
-    c.execute("CREATE TABLE IF NOT EXISTS contacts (line_userid text, name text, county text, school text, phone text);")
+    cur.execute('CREATE TABLE IF NOT EXISTS contacts (line_userid text, name text, county text, school text, phone text);')
 
     line_userid = account["userid"]
     name = account["name"]
@@ -14,101 +11,108 @@ def get_account_db(account):
     phone = account["phone"]
 
     #寫入資料庫
-    c.execute('INSERT INTO contacts VALUES ("{}","{}","{}","{}","{}");'.format(line_userid, name, county, school, phone))
-    conn.commit()
-    conn.close()
-
+    cur.execute(
+        """INSERT INTO contacts VALUES (%s,%s,%s,%s,%s);""",
+        (line_userid, name, county, school, phone),
+    )
+    db.conn.commit()
+    
+    cur.close()
     ##################################
     ##########找所有人的userid#########
     ##################################
 
-def get_userid_db():
 
-    conn = sqlite3.connect('diana.db')
-    c = conn.cursor()
+def get_userid_db(db):
+    
+    cur = db.conn.cursor()
 
-    cursor = c.execute('SELECT * FROM contacts')
+    cur.execute('SELECT * FROM contacts')
 
-    result = cursor.fetchall()
+    result = cur.fetchall()
     userid = []
 
     for i in range(len(result)):
         uid = result[i][0]
         userid.append(uid)
 
-    conn.commit()
-    conn.close()
-
+    
     return userid
 
     ##################################
     ##########刪掉重複的userid#########
     ##################################
 
-def delete_userid_db(userid):
+def delete_userid_db(userid, db):
 
-    conn = sqlite3.connect('diana.db')
-    c = conn.cursor()
+    cur = db.conn.cursor()
+    cur.execute("DELETE FROM contacts WHERE line_userid=%s", (userid,))
 
-    c.execute("DELETE from contacts WHERE line_userid='{}'".format(userid))
-
-    conn.commit()
-    conn.close()
+    db.conn.commit()
+    cur.close()
 
 
-
-def get_school_db(county):
+def get_school_db(county, db):
 
     #開 DB
-    conn = sqlite3.connect("diana.db")
-    c = conn.cursor()
+    cur = db.conn.cursor()
 
     #從diana.db撈各個學校(schools)
-    cursor = c.execute('SELECT * FROM schools WHERE county="{}" '.format(county))
-    schools = cursor.fetchall()
+    cur.execute("SELECT * FROM schools WHERE county=%s", (county,))
+    schools = cur.fetchall()
 
     data = {}
 
     for i in range(len(schools)):
-        data[schools[i][1]] = {"county":schools[i][2], "address":schools[i][3], "latitude":schools[i][4], "longitude":schools[i][5], "name":"", "phone":"", "userid":"", "YN":0}
+        data[schools[i][1]] = {
+            "county": schools[i][2],
+            "address": schools[i][3],
+            "latitude": schools[i][4],
+            "longitude": schools[i][5],
+            "name": "",
+            "phone": "",
+            "userid": "",
+            "YN": 0,
+        }
 
     #從diana.db撈聯絡人資料(contacts)
     school_name = list(data.keys())
-
+    
+    cur.close()
     return school_name
 
-def no_repeat_school_db(county):
+def no_repeat_school_db(county, db):
 
-    conn = sqlite3.connect("diana.db")
-    c = conn.cursor()
+    cur = db.conn.cursor()
 
     #從diana.db撈各個學校(schools)
-    cursor = c.execute('SELECT * FROM contacts WHERE county="{}" '.format(county))
-    schools = cursor.fetchall()
+    cur.execute('SELECT * FROM contacts WHERE county="%s"', (county,))
+    schools = cur.fetchall()
 
     data = {}
 
     for i in range(len(schools)):
-        data[schools[i][3]] = {"county":schools[i][2]}
+        data[schools[i][3]] = {"county": schools[i][2]}
 
     #從diana.db撈聯絡人資料(contacts)
     school_name = list(data.keys())
-
+    
+    cur.close()
     return school_name
 
 
-def get_county_db():
+def get_county_db(db):
 
-    conn = sqlite3.connect("diana.db")
-    c = conn.cursor()
+    cur = db.conn.cursor()
 
     #從diana.db撈各個學校(schools)
-    cursor = c.execute('SELECT * FROM counties')
-    counties = cursor.fetchall()
-
+    cur.execute('SELECT * FROM counties')
+    counties = cur.fetchall()
+    
     data = []
 
     for i in range(len(counties)):
         data.append(counties[i][1])
-
+        
+    cur.close()
     return data

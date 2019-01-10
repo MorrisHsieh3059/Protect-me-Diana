@@ -1,25 +1,12 @@
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,
-    SourceUser, SourceGroup, SourceRoom,
-    TemplateSendMessage, ConfirmTemplate, MessageAction,
-    ButtonsTemplate, ImageCarouselTemplate, ImageCarouselColumn, URIAction,
-    PostbackAction, DatetimePickerAction, PostbackTemplateAction,
-    CameraAction, CameraRollAction, LocationAction,
-    CarouselTemplate, CarouselColumn, PostbackEvent,
-    StickerMessage, StickerSendMessage, LocationMessage, LocationSendMessage,
-    ImageMessage, VideoMessage, AudioMessage, FileMessage,
-    UnfollowEvent, FollowEvent, JoinEvent, LeaveEvent, BeaconEvent,
-    FlexSendMessage, BubbleContainer, ImageComponent, BoxComponent,
-    TextComponent, SpacerComponent, IconComponent, ButtonComponent,
-    SeparatorComponent, QuickReply, QuickReplyButton
+    TemplateSendMessage, ConfirmTemplate, PostbackTemplateAction,
 )
 
-from .class_DB import DB             #DB抓問題
+from .get_question_db import get_category             #DB抓問題
 
 
-def confirm(cat, i):
-    db = DB()
-    questions = db.get_category(cat)
+def confirm(cat, i, db):
+    questions = get_category(cat, db)
     #這裡i 不用 -= 1 是因為data[userid][cat]是從 0開始計算
     return   TemplateSendMessage(
                 alt_text='Confirm template',
