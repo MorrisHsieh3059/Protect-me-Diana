@@ -1,16 +1,20 @@
-def event(db):
+import sqlite3
 
-    # 開 DB
+def event():
 
-    cur = db.conn.cursor()
+    #開 DB
 
-    # 從diana.db撈各個學校(schools)
+    conn = sqlite3.connect('diana.db')
+    c = conn.cursor()
 
-    cur.execute('SELECT * FROM assessment')
+    #從diana.db撈各個學校(schools)
 
-    result = cur.fetchall()
+    cursor = c.execute('SELECT * FROM assessment')
+
+    result = cursor.fetchall()
     ass_id = []
     event = []
+
 
     data = {}
 
@@ -18,9 +22,10 @@ def event(db):
         ass_id.append(result[i][0])
         event.append(result[i][1])
 
-        data[ass_id[i]] = {"ass_id": ass_id[i], "event": event[i]}
+        data[ass_id[i]] = {"ass_id":ass_id[i], "event":event[i]}
 
-    db.conn.commit()
-    cur.close()
+
+    conn.commit()
+    conn.close()
 
     return data

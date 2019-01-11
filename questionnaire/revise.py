@@ -1,8 +1,20 @@
 from linebot.models import (
-    TemplateSendMessage, ConfirmTemplate, PostbackTemplateAction,
+    MessageEvent, TextMessage, TextSendMessage,
+    SourceUser, SourceGroup, SourceRoom,
+    TemplateSendMessage, ConfirmTemplate, MessageAction,
+    ButtonsTemplate, ImageCarouselTemplate, ImageCarouselColumn, URIAction,
+    PostbackAction, DatetimePickerAction, PostbackTemplateAction,
+    CameraAction, CameraRollAction, LocationAction,
+    CarouselTemplate, CarouselColumn, PostbackEvent,
+    StickerMessage, StickerSendMessage, LocationMessage, LocationSendMessage,
+    ImageMessage, VideoMessage, AudioMessage, FileMessage,
+    UnfollowEvent, FollowEvent, JoinEvent, LeaveEvent, BeaconEvent,
+    FlexSendMessage, BubbleContainer, ImageComponent, BoxComponent,
+    TextComponent, SpacerComponent, IconComponent, ButtonComponent,
+    SeparatorComponent, QuickReply, QuickReplyButton
 )
 
-from .get_question_db import get_category     #DB抓問題
+from .class_DB import DB     #DB抓問題
 
 def revise_idiot(text, cat, i):
 
@@ -24,10 +36,10 @@ def revise_idiot(text, cat, i):
     else:
         ret = '請輸入正確格式\n例如：Normal Q10'
 
-def revise_confirm(cat, i, db):
+def revise_confirm(cat, i):
     i -= 1 #相對題號從1開始算，所以要減1才能符合list的規定
-    
-    questions = get_category(cat, db)
+    db = DB()
+    questions = db.get_category(cat)
     return   TemplateSendMessage(
                 alt_text='Confirm template',
                 template=ConfirmTemplate(

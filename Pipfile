@@ -9,6 +9,7 @@ line-bot-sdk = "*"
 honcho = "*"
 gunicorn = "*"
 psycopg2 = "*"
+pandas = "*"
 
 [dev-packages]
 
