@@ -8,7 +8,7 @@ import os
 import sys
 import tempfile
 from argparse import ArgumentParser
-from flask import Flask, request, abort, jsonify
+from flask import Flask, request, abort, jsonify, send_from_directory
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -23,7 +23,7 @@ from linebot.models import (
 
 from questionnaire.extract_function import extract, revise_extract       #RE抓數字
 from questionnaire.ct_push import ct_push               #抓推播新的carousel template
-from questionnaire.confirm import confirm, account_confirm            #抓confirm template 進來
+from questionnaire.confirm import confirm          #抓confirm template 進來
 from questionnaire.carousel import *               #抓caousel columns
 from questionnaire.confirm_push import confirm_push
 from questionnaire.next import next
@@ -32,9 +32,11 @@ from account.get_account_db import (
     get_account_db, get_userid_db, delete_userid_db,
     get_school_db, no_repeat_school_db, get_county_db
 )
+from account.account_confirm import account_confirm
 from questionnaire.tempview import takeFirst, tempview, tempview_confirm
 from questionnaire.converter import converter
 from questionnaire.revise import revise_idiot, revise_confirm, revise_able
+from questionnaire.get_yitianda_db import get_yitianda_db
 from connect.fetch import fetch
 from connect.detail import detail
 from connect.event import event
@@ -46,8 +48,9 @@ from werkzeug.contrib.cache import SimpleCache, MemcachedCache
 
 
 db = Database(os.environ.get('DATABASE_URL'), db_type='postgres')
+# set the project root directory as the static folder, you can set others.
+app = Flask(__name__, static_url_path='')
 
-app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
     ##################################
@@ -83,6 +86,26 @@ else:
 
 handler = WebhookHandler(os.environ.get("SECRET"))
 
+#
+# @app.route('/js/<path:path>')
+# def send_js(path):
+#     return send_from_directory('js', path)
+#
+# if __name__ == "__main__":
+#     app.run()
+
+@app.route('/report/<path:name>')
+# 檔案在不在,在哪裡/有沒有亂戳,怎麼丟
+def reportroute(name):
+    name = 'index.html' if name is "" else name
+    path = os.path.join("report", name)
+    with open(path) as f:
+        content = f.read()
+    return content
+
+def send_js(name):
+    return send_from_directory('js', name)
+
 @app.route('/event')
 def eventroute():
     return jsonify(event(db))
@@ -91,14 +114,13 @@ def eventroute():
 def fetchroute():
     county = request.args.get('county')
     ass_id  = request.args.get('assessment_id')
-    return jsonify(fetch('{"county":"' + county + '", "assessment_id":' + ass_id + '}'), db)
+    return jsonify(fetch('{"county":"' + county + '", "assessment_id":' + ass_id + '}', db))
 
 @app.route('/detail')
 def detailroute():
     userid = request.args.get('userid')
     ass_id = request.args.get('assessment_id')
-    print(userid, ass_id)
-    return jsonify(detail('{"userid":"' + userid + '", "assessment_id":' + ass_id + '}'), db)
+    return jsonify(detail('{"userid":"' + userid + '", "assessment_id":' + ass_id + '}', db))
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -109,7 +131,7 @@ def callback():
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
     print(body)
-    
+
     # handle webhook body
     try:
         handler.handle(body, signature)
@@ -146,27 +168,35 @@ def handle_text_message(event):
 
 
     if text == '我要統計資料':
-        ret = TextSendMessage(text="此功能尚待開發唷")
+        ret = TextSendMessage(text="https://pmdiana.hcilab.katrina.tw/report/index.html")
         line_bot_api.reply_message(event.reply_token, ret)
 
     if text == '請給我表單填寫':
-        if userid not in data:#沒有USERID的話，add key(第一次填寫的時候) 然後推處死carousel
-            data[userid] = {"Quick":0, "Normal":0, "Indoors":0, "Corridor":0, "Outdoors":0, "Answered":[]}
-            feedback[userid] = []
-            ct_container = ct_push(data, userid)  #把4類別加進來
-            carousel_template = CarouselTemplate(columns=ct_container)
-            template_message = TemplateSendMessage(alt_text='災情回覆問卷', template=carousel_template)
-            line_bot_api.reply_message(event.reply_token, template_message)
 
-        elif data[userid]['Quick'] != 0:#QC填到一半智障又打一次carousel
-            line_bot_api.reply_message(
-                event.reply_token, TextSendMessage(text="您已選擇快速檢核！請填頁面上的最後一題"))
+        if userid not in get_yitianda_db(get_latest_assessment_id_db(db)[0], db): #確認他有沒有填過這次問卷
+            if userid not in data:#沒有USERID的話，add key(第一次填寫的時候) 然後推處死carousel
+                data[userid] = {"Quick":0, "Normal":0, "Indoors":0, "Corridor":0, "Outdoors":0, "Answered":[]}
+                feedback[userid] = []
+                ct_container = ct_push(data, userid)  #把4類別加進來
+                carousel_template = CarouselTemplate(columns=ct_container)
+                template_message = TemplateSendMessage(alt_text='災情回覆問卷', template=carousel_template)
+                line_bot_api.reply_message(event.reply_token, template_message)
+
+            elif data[userid]['Quick'] != 0:#QC填到一半智障又打一次carousel
+                line_bot_api.reply_message(
+                    event.reply_token, TextSendMessage(text="您已選擇快速檢核！請填頁面上的最後一題"))
+
+            else:
+                ct_container = ct_push(data, userid)
+                carousel_template = CarouselTemplate(columns=ct_container)
+                template_message = TemplateSendMessage(alt_text='問卷選單', template=carousel_template)
+                line_bot_api.reply_message(event.reply_token, template_message)
 
         else:
-            ct_container = ct_push(data, userid)
-            carousel_template = CarouselTemplate(columns=ct_container)
-            template_message = TemplateSendMessage(alt_text='問卷選單', template=carousel_template)
-            line_bot_api.reply_message(event.reply_token, template_message)
+            ret1 = TextSendMessage(text="您已為本次事件提供災情回覆咯~")
+            ret2 = TextSendMessage(text="本次填寫的事件為："+str(get_latest_assessment_id_db(db)[1]))
+            line_bot_api.reply_message(
+                event.reply_token, [ret1] + [ret2])
 
 
     elif '已回覆待改進' not in text and '已回覆沒問題' not in text and 'Normal' not in text and 'Indoors' not in text and 'Corridor' not in text and 'Outdoors' not in text:
@@ -284,6 +314,7 @@ def handle_text_message(event):
         line_bot_api.reply_message(event.reply_token, ret)
         account_q += 1
     elif account_q == 2:
+        text = '臺北市' if text == '台北市' else text
         account[userid]['county'] = text
         if text not in get_county_db(db):
             ret = TextSendMessage(text="不好意思，您所輸入的縣市不在我國疆域。提醒您中華民國採用繁體中文😁\n【請重新設定帳戶】")

@@ -20,9 +20,10 @@ def detail(payload, db):
     content = []
 
     cur.execute(
-        """SELECT * FROM responses WHERE (userid=%s AND assessment_id=%s AND YN=%s""",
+        """SELECT * FROM responses WHERE (userid=%s AND assessment_id=%s AND yn=%s)""",
         (UID, ass_id, 0),
     )
+    #yn 是 responses 裡面的待改進
     ret = cur.fetchall()
 
     for i in range(len(ret)):
@@ -46,6 +47,6 @@ def detail(payload, db):
         }
 
     db.conn.commit()
-    
+
     cur.close()
     return detail

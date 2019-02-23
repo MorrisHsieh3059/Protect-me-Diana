@@ -12,7 +12,7 @@ def fetch(payload, db):
 
     # 從diana.db撈各個學校(schools)
 
-    cur.execute('SELECT * FROM schools WHERE county="%s" ', (county,))
+    cur.execute('SELECT * FROM schools WHERE county=%s ', (county,))
     schools = cur.fetchall()
 
     data = {}
@@ -27,6 +27,7 @@ def fetch(payload, db):
             "phone": "",
             "userid": "",
             "YN": 0,
+            "severity": 0
         }
 
     # 從diana.db撈聯絡人資料(contacts)
@@ -35,11 +36,12 @@ def fetch(payload, db):
     for i in range(len(school_name)):
 
         cur.execute(
-            'SELECT * FROM contacts WHERE (county="%s" AND school="%s") ',
+            'SELECT * FROM contacts WHERE (county=%s AND school=%s) ',
             (county, school_name[i]),
         )
 
         contacts = cur.fetchall()
+
 
         if len(contacts) > 0:
             data[school_name[i]]["name"] = contacts[0][1]  # 塞聯絡人名字進去
@@ -52,12 +54,10 @@ def fetch(payload, db):
 
     db.conn.commit()
 
-    # diana.db結束
-
     # 從response.db看看他有沒有填過
     # 從response.db撈特定事件答題過的人，填過就把YN改成1
 
-    cur.execute('SELECT * FROM responses WHERE assessment_id="%s" ', (ass_id,))
+    cur.execute('SELECT * FROM responses WHERE assessment_id=%s ', (ass_id,))
     response = cur.fetchall()
 
     # 整理出以填答過的人，放進一個list
@@ -68,12 +68,41 @@ def fetch(payload, db):
         userid = response[i][2]
         if userid not in yitianda:
             yitianda.append(userid)
-
     for i in range(len(data)):
         if data[school_name[i]]["userid"] in yitianda:
             data[school_name[i]]["YN"] = 1
-
     db.conn.commit()
+
+    score = {}
+    for i in range(len(yitianda)):
+        cur.execute('SELECT * FROM responses WHERE assessment_id=%s AND userid=%s ', (ass_id, yitianda[i]))
+        sheet = cur.fetchall()
+        fenshu = 0
+        y_n = []
+
+        for j in range(len(sheet)):
+            y_n.append(sheet[j][0])
+
+        if 0 not in y_n:
+           fenshu = 100
+        elif 0 in y_n[0:64]:
+            for k in range(64):
+                if y_n[k] == 1:
+                    fenshu += 100/64
+        elif 0 in y_n[64:77]:
+            for k in range(64,77):
+                if y_n[k] == 1:
+                    fenshu += 100/13
+
+        fenshu = round(fenshu)
+        score[yitianda[i]] = fenshu
+        db.conn.commit()
+
+    for i in range(len(data)):
+        if data[school_name[i]]["userid"] in yitianda:
+            a = data[school_name[i]]["userid"]
+            data[school_name[i]]["severity"] = score[a]
+
     cur.close()
 
     return data

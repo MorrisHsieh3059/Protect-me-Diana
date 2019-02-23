@@ -1,0 +1,23 @@
+{
+  "name": "diana-visualization",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bourbon0212/Diana-Visualization.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bourbon0212/Diana-Visualization/issues"
+  },
+  "homepage": "https://github.com/Bourbon0212/Diana-Visualization#readme",
+  "dependencies": {
+    "getmdl-select": "^2.0.1",
+    "semantic-ui": "^2.4.2"
+  }
+}
