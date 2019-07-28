@@ -16,22 +16,21 @@ def extract(x):
     #                          EX:'no=' + str(questions[i][0]) + '&answer=NO'
     # 輸出：list(['絕對題號', 'OK/NO(沒問題或待改進)'])
 
-def revise_extract(x):
-    y = re.findall("([^ ]+)", x)[0]
-    z = re.findall("([^ ]+)", x)[1]
+def revise_extract(text):
 
-    if z[0] == 'Q':
-        z = re.findall("Q([^ ]+)", z)
-    else:
-        z = re.findall("q([^ ]+)", z)
+    cat = text[0]
+    i = int(text[1:])
 
-    y = 'Quick' if y == 'quick' else y
-    y = 'Normal' if y == 'normal' else y
-    y = 'Indoors' if y == 'indoors' else y
-    y = 'Corridor' if y == 'corridor' else y
-    y = 'Outdoors' if y == 'outdoors' else y
+    cat = 'Quick' if cat == 'Q' or cat =='q' else cat
+    cat = 'Normal' if cat == 'N' or cat =='n' else cat
+    cat = 'Indoors' if cat == 'I' or cat =='i' else cat
+    cat = 'Corridor' if cat == 'C' or cat =='c' else cat
+    cat = 'Outdoors' if cat == 'O' or cat =='o' else cat
 
-    lst = [y,int(z[0])]
+    lst = [cat, i]
+
+
+
     return lst
 
     # 功能：把使用者在回答要修改表單答覆之後，我們要把他輸入的文字訊息，抓出類別、題號

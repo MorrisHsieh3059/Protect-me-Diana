@@ -26,7 +26,7 @@ def revise_idiot(text, cat, i):
 
 def revise_confirm(cat, i, db):
     i -= 1 #相對題號從1開始算，所以要減1才能符合list的規定
-    
+
     questions = get_category(cat, db)
     return   TemplateSendMessage(
                 alt_text='Confirm template',
@@ -36,12 +36,38 @@ def revise_confirm(cat, i, db):
                         PostbackTemplateAction(
                             label='沒問題',
                             text=str(questions[i][2]) + ' 第' + str(questions[i][3]) + '題已回覆沒問題',  #給使用者看相對題號
-                            data='revise=' + str(questions[i][0]) + '&answer=OK' #questions是整份問卷第幾題 絕對題號
+                            data='all_revise=' + str(questions[i][0]) + '&answer=OK' #questions是整份問卷第幾題 絕對題號
                         ),
                         PostbackTemplateAction(
                             label='待改進',
                             text=str(questions[i][2]) + ' 第' + str(questions[i][3]) + '題已回覆待改進', #給使用者看相對題號
-                            data='revise=' + str(questions[i][0]) + '&answer=NO'
+                            data='all_revise=' + str(questions[i][0]) + '&answer=NO'
+                        )
+                    ]
+                ))
+
+    # 功能： 為了避免與之前的confirm搞混，我們改變該confirm template回傳的data
+    # 輸入： 1. cat = revise_extract(text)[0]
+    #       2. i   = revise_extract(text)[1]
+    # 輸出： ConfirmTemplate
+def cat_revise_confirm(cat, i, db):
+    i -= 1 #相對題號從1開始算，所以要減1才能符合list的規定
+
+    questions = get_category(cat, db)
+    return   TemplateSendMessage(
+                alt_text='Confirm template',
+                template=ConfirmTemplate(
+                    text = str(questions[i][2]) + ' Q' + str(questions[i][3]) + ' : ' + questions[i][1],
+                    actions=[
+                        PostbackTemplateAction(
+                            label='沒問題',
+                            text=str(questions[i][2]) + ' 第' + str(questions[i][3]) + '題已回覆沒問題',  #給使用者看相對題號
+                            data='cat_revise=' + str(questions[i][0]) + '&answer=OK' #questions是整份問卷第幾題 絕對題號
+                        ),
+                        PostbackTemplateAction(
+                            label='待改進',
+                            text=str(questions[i][2]) + ' 第' + str(questions[i][3]) + '題已回覆待改進', #給使用者看相對題號
+                            data='cat_revise=' + str(questions[i][0]) + '&answer=NO'
                         )
                     ]
                 ))
