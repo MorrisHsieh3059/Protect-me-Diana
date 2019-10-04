@@ -3,10 +3,12 @@ import re
 def extract(x):
     y = re.findall("no=([^&]+)", x)
     a = re.findall("wer=([^&]+)", x)
+    cat = re.findall("cat=([^&]+)", x)
+    h = cat[0]
     b = a[0]
     z = y[0]
     z = int(z)
-    e = [z, b]
+    e = [h, z, b]
 
     return e
 

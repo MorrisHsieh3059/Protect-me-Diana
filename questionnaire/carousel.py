@@ -28,7 +28,7 @@ Standard = CarouselColumn(
                         )
                     ]
                 )
-Normal0 = CarouselColumn( 
+Normal0 = CarouselColumn(
                     thumbnail_image_url=image_url_N0,
                     title='一般檢查(Normal)',
                     text='這是一般性檢查',
@@ -48,7 +48,7 @@ Normal1 = CarouselColumn(
                         PostbackTemplateAction(
                             label='我想修改答案',
                             text='我要修改我的答案',
-                            data='cat_edit=OK'
+                            data='cat_edit=OK;Normal'
                         )
                     ]
                 )
@@ -72,7 +72,7 @@ Indoors1 = CarouselColumn(
                         PostbackTemplateAction(
                             label='我想修改答案',
                             text='我要修改我的答案',
-                            data='cat_edit=OK'
+                            data='cat_edit=OK;Indoors'
                         )
                     ]
                 )
@@ -96,7 +96,7 @@ Corridor1 = CarouselColumn(
                         PostbackTemplateAction(
                             label='我想修改答案',
                             text='我要修改我的答案',
-                            data='cat_edit=OK'
+                            data='cat_edit=OK;Corridor'
                         )
                     ]
                 )
@@ -120,7 +120,7 @@ Outdoors1 = CarouselColumn(
                         PostbackTemplateAction(
                             label='我想修改答案',
                             text='我要修改我的答案',
-                            data='cat_edit=OK'
+                            data='cat_edit=OK;Outdoors'
                         )
                     ]
                 )

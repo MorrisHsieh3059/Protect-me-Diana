@@ -2,21 +2,21 @@ from linebot.models import (
     TextSendMessage, StickerSendMessage,
     TemplateSendMessage, ConfirmTemplate, PostbackTemplateAction,
 )
-from .get_question_db import get_all            #DB抓問題
+from .get_question_db import get_category
 
 def takeFirst(elem):
     return elem[0]
 
 def tempview(output, db):
-    questions = get_all(db)
     render = []
 
     output.sort(key=takeFirst)
 
-    for i, value in output:
-        i -= 1 #題號校正
+    for cat, Q, value in output:
+        questions = get_category(cat, db)
+
         display = """題目：{} Q{}({})
-回覆：{}""".format(questions[i][2], str(questions[i][3]), questions[i][1], value)
+回覆：{}""".format(questions[Q-1][2], str(questions[Q-1][3]), questions[Q-1][1], value)
         render.append(display)
 
     return """您好，您的回覆如下：
@@ -57,28 +57,17 @@ def tempview_confirm(output, db):
 
 def cat_tempview(cat, output, db):
 
-    num = []
-    num = list(range(1,13)) if cat == 'Normal' else num
-    num = list(range(13,33)) if cat == 'Indoors' else num
-    num = list(range(33,46)) if cat == 'Corridor' else num
-    num = list(range(46,65)) if cat == 'Outdoors' else num
-
-    newoutput = []
-    for i in output:
-        if i[0] in num:
-            newoutput.append(i)
-    output = newoutput
-
-    questions = get_all(db)
+    questions = get_category(cat, db)
     render = []
+
 
     output.sort(key=takeFirst)
 
-    for i, value in output:
-        i -= 1 #題號校正
-        display = """題目：{} Q{}({})
-回覆：{}""".format(questions[i][2], str(questions[i][3]), questions[i][1], value)
-        render.append(display)
+    for cate, Q, value in output:
+        if cate == cat:
+            display = """題目：{} Q{}({})
+    回覆：{}""".format(questions[Q-1][2], str(questions[Q-1][3]), questions[Q-1][1], value)
+            render.append(display)
 
     return """您好，您的回覆如下：
 

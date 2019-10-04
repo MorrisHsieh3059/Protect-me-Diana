@@ -4,19 +4,22 @@ from linebot.models import (
 
 from .confirm import confirm    #抓confirm template 進來
 
-def next(data, userid, cat, parse, db):
+def next(data, userid, parse, db):
+    cat = parse[0]
+    Q = parse[1]
 
-        if parse[0] in data[userid]["Answered"]:
-            return TextSendMessage(text="您已經填寫過此題了！請填頁面上的最後一題"), True
+    if Q in data[userid]["Answered"][cat]:
+        return TextSendMessage(text="您已經填寫過此題了！請填頁面上的最後一題"), "00"
 
-        else:
-            if parse[1] == 'OK':
-                data[userid]["Answered"].append(parse[0])
-                data[userid][cat] += 1
-                return confirm(cat ,data[userid][cat], db), True
+    else:
+        if parse[2] == 'OK':
+            data[userid]["Answered"][cat].append(Q)
+            return confirm(cat, Q, db), "00"
 
-            elif parse[1] == 'NO':
-                return TextSendMessage(text="請簡述災情"), False
+        elif parse[2] == 'NO':
+            data[userid]["cat"] = cat
+            data[userid]["Q"] = Q
+            return TextSendMessage(text="請簡述災情"), "01"
 
     # 功能：首先，不讓他重複填答。若使用者回覆沒問題，則在data[userid]['Answered']中
     #      加入該題絕對題號，然後計數器data[userid][cat] + 1，並且推下議題的confirm

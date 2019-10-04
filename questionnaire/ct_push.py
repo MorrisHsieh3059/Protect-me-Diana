@@ -1,32 +1,35 @@
 from .carousel import *          #CT抓欄位
+from .get_question_db import get_category
 
-def ct_push(data, userid, quick, status):
+def ct_push(data, userid, quick, status, db):
     ct_container = []
 
-    if data[userid] == {"Quick":0, "Normal":0, "Indoors":0, "Corridor":0, "Outdoors":0, "Answered":[]} and quick == 0:
+    if data[userid] == { "Answered": { "Quick": [], "Normal":[], "Indoors":[], "Corridor":[], "Outdoors":[] }, "status": "00", "feedback": []} and quick == 0:
         ct_container = [Quick, Standard]
+
     else:
-        if data[userid]['Normal'] == 12 and status == 1:#該類題數
+
+        if len(get_category('Normal', db)) - 1 in data[userid]['Answered']['Normal'] and status == 1:#該類題數
             ct_container.insert(0, Normal1)
         else:
             ct_container.insert(0, Normal0)
 
-        if data[userid]['Indoors'] == 20 and status == 1:#該類題數
+        if len(get_category('Indoors', db)) - 1 in data[userid]['Answered']['Indoors'] and status == 1:#該類題數
             ct_container.insert(1, Indoors1)
         else:
             ct_container.insert(1, Indoors0)
 
-        if data[userid]['Corridor'] == 13 and status == 1:#該類題數
+        if len(get_category('Corridor', db)) - 1 in data[userid]['Answered']['Corridor'] and status == 1:#該類題數
             ct_container.insert(2, Corridor1)
         else:
             ct_container.insert(2, Corridor0)
 
-        if data[userid]['Outdoors'] == 19 and status == 1:#該類題數
+        if len(get_category('Outdoors', db)) - 1 in data[userid]['Answered']['Outdoors'] and status == 1:#該類題數
             ct_container.insert(3, Outdoors1)
         else:
             ct_container.insert(3, Outdoors0)
 
-        if len(data[userid]['Answered']) == 0 and quick == 0:
+        if data[userid]['Answered']['Quick'] == [] and data[userid]['Answered']['Normal'] == [] and data[userid]['Answered']['Indoors'] == [] and data[userid]['Answered']['Corridor'] == [] and data[userid]['Answered']['Outdoors'] == [] and quick == 0:
             ct_container.insert(0, Quick)
         else:
             pass
