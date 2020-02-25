@@ -4,7 +4,7 @@ from .get_question_db import get_category
 def ct_push(data, userid, quick, status, db):
     ct_container = []
 
-    if data[userid] == { "Answered": { "Quick": [], "Normal":[], "Indoors":[], "Corridor":[], "Outdoors":[] }, "status": "00", "feedback": []} and quick == 0:
+    if data[userid] == { "Answered": { "Quick": [], "Normal":[], "Indoors":[], "Corridor":[], "Outdoors":[] }, "status": "00", "feedback": [], "current": ()} and quick == 0:
         ct_container = [Quick, Standard]
 
     else:

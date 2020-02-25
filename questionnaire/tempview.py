@@ -12,7 +12,7 @@ def tempview(output, db):
 
     output.sort(key=takeFirst)
 
-    for cat, Q, value in output:
+    for cat, Q, value, pos, img_link in output:
         questions = get_category(cat, db)
 
         display = """題目：{} Q{}({})
@@ -60,10 +60,9 @@ def cat_tempview(cat, output, db):
     questions = get_category(cat, db)
     render = []
 
-
     output.sort(key=takeFirst)
 
-    for cate, Q, value in output:
+    for cate, Q, value, pos, img_link in output:
         if cate == cat:
             display = """題目：{} Q{}({})
     回覆：{}""".format(questions[Q-1][2], str(questions[Q-1][3]), questions[Q-1][1], value)
