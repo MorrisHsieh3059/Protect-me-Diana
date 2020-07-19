@@ -2,8 +2,6 @@ from linebot.models import (
     TemplateSendMessage, ConfirmTemplate, PostbackTemplateAction,
 )
 
-from .get_question_db import get_category     #DB抓問題
-
 def revise_idiot(text, cat, i):
 
     if cat == "Quick" and int(i) > 13:
@@ -27,7 +25,7 @@ def revise_idiot(text, cat, i):
 def revise_confirm(cat, i, db):
     i -= 1 #相對題號從1開始算，所以要減1才能符合list的規定
 
-    questions = get_category(cat, db)
+    questions = db.get_category(cat)
     return   TemplateSendMessage(
                 alt_text='Confirm template',
                 template=ConfirmTemplate(
@@ -53,7 +51,7 @@ def revise_confirm(cat, i, db):
 def cat_revise_confirm(cat, i, db):
     i -= 1 #相對題號從1開始算，所以要減1才能符合list的規定
 
-    questions = get_category(cat, db)
+    questions = db.get_category(cat)
     return   TemplateSendMessage(
                 alt_text='Confirm template',
                 template=ConfirmTemplate(

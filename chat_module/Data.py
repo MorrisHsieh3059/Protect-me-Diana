@@ -17,9 +17,10 @@ class Data:
                                 "Corridor":[],
                                 "Outdoors":[],
                             },
-                            "status": "00",
+                            "status": "pre",
                             "feedback": [],
                             "current": (),
+                            "building": [],
                         }
         return
     def remove_user(self, userid):
@@ -60,6 +61,10 @@ class Data:
         """ 更改某 user 的 current """
         self.__data[userid]["current"] = current
         return
+    def set_user_building(self, userid, building):
+        """ 紀錄某 user 的 building name """
+        self.__data[userid]["building"].append(building)
+        return
 
         ################
         #### getter ####
@@ -73,3 +78,7 @@ class Data:
         return self.__data[userid]["current"]
     def get_user_feedback(self, userid):
         return self.__data[userid]["feedback"]
+    def get_user_status(self, userid):
+        return self.__data[userid]["status"]
+    def get_user_building(self, userid):
+        return self.__data[userid]["building"]

@@ -5,7 +5,7 @@ from linebot.models import (
 from .confirm import confirm            #抓confirm template 進來
 
 
-def confirm_push(data, userid, cat, db):
+def confirm_push(data, userid, cat, DB):
     Q = data[userid]['Answered'][cat][-1] if len(data[userid]['Answered'][cat]) != 0 else 0
 
     if len(data[userid]['Answered']['Quick']) != 0:#QC填到一半 智障又打一次carousel
@@ -15,11 +15,11 @@ def confirm_push(data, userid, cat, db):
         if cat == 'Quick': #不讓她劈腿(換成QC)
              return TextSendMessage(text="您已選擇正規問卷！請填頁面上的最後一題")
         else:
-            return confirm(cat, Q, db)
+            return confirm(cat, Q, DB)
 
     else:
 
-        return confirm(cat, Q, db)
+        return confirm(cat, Q, DB)
 
     # 功能： 回傳confirm template
     #       條件───1. 不讓他填Quick Check填到一半換類別

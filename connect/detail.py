@@ -1,52 +1,39 @@
 import ast
 
-
 def detail(payload, db):
     payload = ast.literal_eval(payload)
-
-    UID = payload["userid"]
-    ass_id = payload["assessment_id"]
-
+    # UID = payload["userid"]
+    assessment_id = payload["assessment_id"]
+    building_id = payload["building_id"]
     detail = {}
 
-    #找他有沒有填答過
     cur = db.conn.cursor()
-
-    #先抓出待改進的內容跟相對題號
-
-    abs_q = []
-    rel_q = []
-    description = []
-    content = []
-
     cur.execute(
-        """SELECT * FROM responses WHERE (userid=%s AND assessment_id=%s AND yn=%s)""",
-        (UID, ass_id, 0),
+        """SELECT b.name AS building, q.category AS category, q.num AS question,
+                  q.content AS content, r.description AS description,
+                  r.img_url AS img_url, r.position AS position, q.id AS abs_q
+           FROM questions AS q
+           JOIN responses AS r
+              ON r.question_id = q.id
+           JOIN buildings AS b
+              ON b.id = r.building_id
+           WHERE (yn IS FALSE AND building_id = %s AND assessment_id = %s);""",
+        (building_id, assessment_id),
     )
+
     #yn 是 responses 裡面的待改進
     ret = cur.fetchall()
-
-    for i in range(len(ret)):
-        abs_q.append(ret[i][4])
-        description.append(ret[i][1])
-
     db.conn.commit()
-
-    #用絕對題號回去抓題目跟類別及相對題號
-
-    for i in range(len(abs_q)):
-        cur.execute("SELECT * FROM question WHERE no=%s", (abs_q[i],))
-        res = cur.fetchall()
-        rel_q.append(res[0][2] + " Q" + str(res[0][3]))
-        content.append(res[0][1])
-
-        detail[abs_q[i]] = {
-            "question":rel_q[i],
-            "content":content[i],
-            "description":description[i],
+    for i in range(len(ret)):
+        per = ret[i]
+        detail[per[7]] = {
+            "question": per[1] + " Q" + str(per[2]),
+            "content": per[3],
+            "description": per[4],
+            "img_url": per[5],
+            "pos": per[6],
         }
 
     db.conn.commit()
-
     cur.close()
     return detail

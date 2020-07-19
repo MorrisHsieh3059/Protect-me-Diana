@@ -1,0 +1,1289 @@
+{
+    "richmenus": [
+        {
+            "name": "SchoolMap09",
+            "size": {
+                "width": 2500,
+                "height": 1686
+            },
+            "chatBarText": "學校區塊09",
+            "selected": true,
+            "areas": [
+                {
+                    "bounds": {
+                        "x": 50,
+                        "y": 177,
+                        "width": 795,
+                        "height": 402
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "職務一舍"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 862,
+                        "y": 258,
+                        "width": 793,
+                        "height": 400
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "職務二舍"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1668,
+                        "y": 338,
+                        "width": 798,
+                        "height": 414
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "動作 3"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1554,
+                        "y": 1035,
+                        "width": 532,
+                        "height": 291
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "臺灣建築科技中心"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 0,
+                        "y": 1353,
+                        "width": 833,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "上一頁"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1666,
+                        "y": 1353,
+                        "width": 834,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "回首頁"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "MainMenu",
+            "size": {
+                "width": 2500,
+                "height": 1686
+            },
+            "chatBarText": "主選單",
+            "selected": true,
+            "areas": [
+                {
+                    "bounds": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 832,
+                        "height": 843
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "檢查"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 833,
+                        "y": 0,
+                        "width": 836,
+                        "height": 843
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "紀錄"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1668,
+                        "y": 0,
+                        "width": 832,
+                        "height": 843
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "使用指南"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 0,
+                        "y": 843,
+                        "width": 832,
+                        "height": 843
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "通知"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 833,
+                        "y": 843,
+                        "width": 836,
+                        "height": 843
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "設定"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1668,
+                        "y": 843,
+                        "width": 832,
+                        "height": 843
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "相關資料"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "SchoolMap01",
+            "size": {
+                "width": 2500,
+                "height": 1686
+            },
+            "chatBarText": "學校區塊01",
+            "selected": true,
+            "areas": [
+                {
+                    "bounds": {
+                        "x": 67,
+                        "y": 17,
+                        "width": 370,
+                        "height": 1330
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "TR研揚大樓"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1262,
+                        "y": 478,
+                        "width": 423,
+                        "height": 147
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "司令台"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 499,
+                        "y": 22,
+                        "width": 902,
+                        "height": 439
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "籃球場"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1520,
+                        "y": 17,
+                        "width": 904,
+                        "height": 447
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "網球場"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 557,
+                        "y": 658,
+                        "width": 1930,
+                        "height": 679
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "運動場"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 833,
+                        "y": 1353,
+                        "width": 833,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "下一頁"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1666,
+                        "y": 1353,
+                        "width": 834,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "回首頁"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 408,
+                        "y": 770,
+                        "width": 114,
+                        "height": 571
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "TR研揚大樓"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 17,
+                        "y": 21,
+                        "width": 84,
+                        "height": 198
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "TR研揚大樓"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "SchoolMap06",
+            "size": {
+                "width": 2500,
+                "height": 1686
+            },
+            "chatBarText": "學校區塊06",
+            "selected": true,
+            "areas": [
+                {
+                    "bounds": {
+                        "x": 5,
+                        "y": 38,
+                        "width": 829,
+                        "height": 1185
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "E1工程一館"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1666,
+                        "y": 933,
+                        "width": 824,
+                        "height": 240
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "E2工程二館"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 0,
+                        "y": 1353,
+                        "width": 833,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "上一頁"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 833,
+                        "y": 1353,
+                        "width": 833,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "下一頁"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1666,
+                        "y": 1353,
+                        "width": 834,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "回首頁"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "SchoolMap08",
+            "size": {
+                "width": 2500,
+                "height": 1686
+            },
+            "chatBarText": "學校區塊08",
+            "selected": true,
+            "areas": [
+                {
+                    "bounds": {
+                        "x": 29,
+                        "y": 51,
+                        "width": 333,
+                        "height": 1246
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "第一學生宿舍"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 360,
+                        "y": 600,
+                        "width": 413,
+                        "height": 696
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "第一學生宿舍"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 769,
+                        "y": 338,
+                        "width": 397,
+                        "height": 958
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "第一學生宿舍"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1284,
+                        "y": 114,
+                        "width": 355,
+                        "height": 1153
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "第三學生宿舍"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1605,
+                        "y": 557,
+                        "width": 186,
+                        "height": 322
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "第三學生宿舍"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1972,
+                        "y": 219,
+                        "width": 321,
+                        "height": 338
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "第二學生宿舍"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1807,
+                        "y": 527,
+                        "width": 668,
+                        "height": 731
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "第二學生宿舍"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 0,
+                        "y": 1353,
+                        "width": 833,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "上一頁"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 833,
+                        "y": 1353,
+                        "width": 833,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "下一頁"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1666,
+                        "y": 1353,
+                        "width": 834,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "回首頁"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "SchoolMap05",
+            "size": {
+                "width": 2500,
+                "height": 1686
+            },
+            "chatBarText": "學校區塊05",
+            "selected": true,
+            "areas": [
+                {
+                    "bounds": {
+                        "x": 25,
+                        "y": 101,
+                        "width": 1052,
+                        "height": 245
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "AD行政大樓"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1200,
+                        "y": 609,
+                        "width": 1127,
+                        "height": 552
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "IB國際大樓"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 2171,
+                        "y": 46,
+                        "width": 296,
+                        "height": 968
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "IB國際大樓"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 0,
+                        "y": 1353,
+                        "width": 833,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "上一頁"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 833,
+                        "y": 1353,
+                        "width": 833,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "下一頁"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1666,
+                        "y": 1353,
+                        "width": 834,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "回首頁"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "SchoolMap02",
+            "size": {
+                "width": 2500,
+                "height": 1686
+            },
+            "chatBarText": "學校區塊02",
+            "selected": true,
+            "areas": [
+                {
+                    "bounds": {
+                        "x": 59,
+                        "y": 396,
+                        "width": 312,
+                        "height": 850
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "IA醫揚大樓"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 510,
+                        "y": 33,
+                        "width": 812,
+                        "height": 597
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "體育館"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 371,
+                        "y": 637,
+                        "width": 135,
+                        "height": 310
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "第二學生餐廳"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 760,
+                        "y": 701,
+                        "width": 710,
+                        "height": 444
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "排球場"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1480,
+                        "y": 64,
+                        "width": 669,
+                        "height": 819
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "S學生活動中心"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 2018,
+                        "y": 891,
+                        "width": 144,
+                        "height": 215
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "第一學生餐廳"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 2166,
+                        "y": 739,
+                        "width": 274,
+                        "height": 169
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "郵局"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 2171,
+                        "y": 413,
+                        "width": 261,
+                        "height": 292
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "教職員工餐廳"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 0,
+                        "y": 1353,
+                        "width": 833,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "上一頁"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 833,
+                        "y": 1353,
+                        "width": 833,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "下一頁"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1666,
+                        "y": 1353,
+                        "width": 834,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "回首頁"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 298,
+                        "y": 106,
+                        "width": 189,
+                        "height": 290
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "體育館"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1456,
+                        "y": 168,
+                        "width": 63,
+                        "height": 194
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "S學生活動中心"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 2132,
+                        "y": 236,
+                        "width": 55,
+                        "height": 155
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "S學生活動中心"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1767,
+                        "y": 863,
+                        "width": 164,
+                        "height": 96
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "S學生活動中心"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 475,
+                        "y": 33,
+                        "width": 46,
+                        "height": 374
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "體育館"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 370,
+                        "y": 395,
+                        "width": 194,
+                        "height": 177
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "體育館"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "SchoolMap03",
+            "size": {
+                "width": 2500,
+                "height": 1686
+            },
+            "chatBarText": "學校區塊03",
+            "selected": true,
+            "areas": [
+                {
+                    "bounds": {
+                        "x": 273,
+                        "y": 563,
+                        "width": 871,
+                        "height": 564
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "游泳池"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1273,
+                        "y": 341,
+                        "width": 484,
+                        "height": 966
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "國際會館二館"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1757,
+                        "y": 502,
+                        "width": 686,
+                        "height": 710
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "T3第三教學大樓"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 0,
+                        "y": 1353,
+                        "width": 833,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "上一頁"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 833,
+                        "y": 1353,
+                        "width": 833,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "下一頁"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1666,
+                        "y": 1353,
+                        "width": 834,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "回首頁"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "SchoolMap00",
+            "size": {
+                "width": 2500,
+                "height": 1686
+            },
+            "chatBarText": "學校平面圖",
+            "selected": true,
+            "areas": [
+                {
+                    "bounds": {
+                        "x": 113,
+                        "y": 1128,
+                        "width": 711,
+                        "height": 461
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "學校區塊01"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 94,
+                        "y": 678,
+                        "width": 853,
+                        "height": 430
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "學校區塊02"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 214,
+                        "y": 408,
+                        "width": 703,
+                        "height": 266
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "學校區塊03"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 850,
+                        "y": 1111,
+                        "width": 594,
+                        "height": 483
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "學校區塊04"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1492,
+                        "y": 1111,
+                        "width": 762,
+                        "height": 529
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "學校區塊05"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 955,
+                        "y": 522,
+                        "width": 888,
+                        "height": 538
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "學校區塊06"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1812,
+                        "y": 920,
+                        "width": 529,
+                        "height": 116
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "學校區塊06"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1871,
+                        "y": 349,
+                        "width": 468,
+                        "height": 572
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "學校區塊07"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 941,
+                        "y": 232,
+                        "width": 822,
+                        "height": 232
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "學校區塊08"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1459,
+                        "y": 0,
+                        "width": 661,
+                        "height": 215
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "學校區塊09"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1876,
+                        "y": 189,
+                        "width": 144,
+                        "height": 156
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "學校區塊09"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "SchoolMap04",
+            "size": {
+                "width": 2500,
+                "height": 1686
+            },
+            "chatBarText": "學校區塊04",
+            "selected": true,
+            "areas": [
+                {
+                    "bounds": {
+                        "x": 41,
+                        "y": 319,
+                        "width": 311,
+                        "height": 916
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "T1第一教學大樓"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1670,
+                        "y": 387,
+                        "width": 780,
+                        "height": 508
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "圖書館"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 2375,
+                        "y": 727,
+                        "width": 69,
+                        "height": 455
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "圖書館"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1029,
+                        "y": 901,
+                        "width": 1346,
+                        "height": 280
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "RB綜合研究大樓"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 380,
+                        "y": 760,
+                        "width": 694,
+                        "height": 471
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "RB綜合研究大樓"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 828,
+                        "y": 651,
+                        "width": 239,
+                        "height": 142
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "RB綜合研究大樓"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 966,
+                        "y": 1116,
+                        "width": 253,
+                        "height": 118
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "RB綜合研究大樓"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 688,
+                        "y": 454,
+                        "width": 564,
+                        "height": 184
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "AU視聽館"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 821,
+                        "y": 336,
+                        "width": 296,
+                        "height": 235
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "AU視聽館"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 46,
+                        "y": 25,
+                        "width": 1989,
+                        "height": 269
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "T4第四教學大樓"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 0,
+                        "y": 1353,
+                        "width": 833,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "上一頁"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 833,
+                        "y": 1353,
+                        "width": 833,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "下一頁"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1666,
+                        "y": 1353,
+                        "width": 834,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "回首頁"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "SchoolMap07",
+            "size": {
+                "width": 2500,
+                "height": 1686
+            },
+            "chatBarText": "學校區塊07",
+            "selected": true,
+            "areas": [
+                {
+                    "bounds": {
+                        "x": 32,
+                        "y": 356,
+                        "width": 711,
+                        "height": 866
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "MA管理大樓"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1030,
+                        "y": 848,
+                        "width": 290,
+                        "height": 236
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "第三學生餐廳"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1321,
+                        "y": 252,
+                        "width": 1158,
+                        "height": 1075
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "T2第二教學大樓"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 743,
+                        "y": 747,
+                        "width": 610,
+                        "height": 98
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "T2第二教學大樓"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 32,
+                        "y": 16,
+                        "width": 2443,
+                        "height": 236
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "EE電資館"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 0,
+                        "y": 1353,
+                        "width": 833,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "上一頁"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 833,
+                        "y": 1353,
+                        "width": 833,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "下一頁"
+                    }
+                },
+                {
+                    "bounds": {
+                        "x": 1666,
+                        "y": 1353,
+                        "width": 834,
+                        "height": 333
+                    },
+                    "action": {
+                        "type": "message",
+                        "text": "回首頁"
+                    }
+                }
+            ]
+        }
+    ]
+}

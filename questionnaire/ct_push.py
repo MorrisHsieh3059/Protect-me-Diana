@@ -1,30 +1,30 @@
 from .carousel import *          #CT抓欄位
-from .get_question_db import get_category
 
 def ct_push(data, userid, quick, status, db):
     ct_container = []
 
-    if data[userid] == { "Answered": { "Quick": [], "Normal":[], "Indoors":[], "Corridor":[], "Outdoors":[] }, "status": "00", "feedback": [], "current": ()} and quick == 0:
+    # if data[userid] == { "Answered": { "Quick": [], "Normal":[], "Indoors":[], "Corridor":[], "Outdoors":[] }, "status": "pre-class", "feedback": [], "current": (), "building": ""} and quick == 0:
+    if data[userid]["Answered"] == { "Quick": [], "Normal":[], "Indoors":[], "Corridor":[], "Outdoors":[] } and data[userid]["status"] == "pre-class" and data[userid]["feedback"] == [] and data[userid]["current"] == () and quick == 0:
         ct_container = [Quick, Standard]
 
     else:
 
-        if len(get_category('Normal', db)) - 1 in data[userid]['Answered']['Normal'] and status == 1:#該類題數
+        if len(db.get_category('Normal')) - 1 in data[userid]['Answered']['Normal'] and status == 1:#該類題數
             ct_container.insert(0, Normal1)
         else:
             ct_container.insert(0, Normal0)
 
-        if len(get_category('Indoors', db)) - 1 in data[userid]['Answered']['Indoors'] and status == 1:#該類題數
+        if len(db.get_category('Indoors')) - 1 in data[userid]['Answered']['Indoors'] and status == 1:#該類題數
             ct_container.insert(1, Indoors1)
         else:
             ct_container.insert(1, Indoors0)
 
-        if len(get_category('Corridor', db)) - 1 in data[userid]['Answered']['Corridor'] and status == 1:#該類題數
+        if len(db.get_category('Corridor')) - 1 in data[userid]['Answered']['Corridor'] and status == 1:#該類題數
             ct_container.insert(2, Corridor1)
         else:
             ct_container.insert(2, Corridor0)
 
-        if len(get_category('Outdoors', db)) - 1 in data[userid]['Answered']['Outdoors'] and status == 1:#該類題數
+        if len(db.get_category('Outdoors')) - 1 in data[userid]['Answered']['Outdoors'] and status == 1:#該類題數
             ct_container.insert(3, Outdoors1)
         else:
             ct_container.insert(3, Outdoors0)

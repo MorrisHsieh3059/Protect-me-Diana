@@ -5,13 +5,15 @@ name = "pypi"
 
 [packages]
 flask = "*"
-line-bot-sdk = "*"
+line-bot-sdk = "==1.15.0"
 honcho = "*"
 gunicorn = "*"
 psycopg2 = "*"
 pandas = "*"
 psycopg2-binary = "*"
-runpy = "*"
+imgurpython = "*"
+tensorflow = "==1.14.0"
+googletrans = "*"
 
 [dev-packages]
 

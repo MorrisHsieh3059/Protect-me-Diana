@@ -1,0 +1,73 @@
+#ratioChart {
+    width: 95%;
+    height: 30px;
+    margin: auto;
+    overflow-x: scroll;
+    overflow-y: hidden;
+}
+
+#overviewChart {
+    overflow-x: scroll;
+}
+#chartDiv > a {
+  color: #2055b6;
+}
+  #chartDiv a:hover {
+    color: #2f6bda;
+  }
+  #chartDiv a:visited {
+    color: #2055b6;
+  }
+
+.c-charts {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.c-chart svg {
+  border: 1px solid #eee;
+}
+
+.c-chart .c-bar {
+  stroke: #2f6bda;
+  stroke-width: 1.5px;
+  fill: #2f6bda;
+  opacity: 0.6;
+}
+    .c-chart .c-bar:hover{
+    fill: #285dbf;
+    transition: .1s;
+    }
+.c-chart--half {
+  flex-basis: 50%;
+}
+
+.c-chart .uncheck {
+    stroke: #dc3545;
+    fill: #dc3545;
+}
+    .c-chart .uncheck:hover{
+      fill: #ea1024;
+      transition: .1s;
+    }
+
+.c-axis {
+  width: 100%;
+  height: 100%;
+}
+
+.abs-line{
+  stroke: #f72525;
+  stroke-width: 1px;
+  fill: none;
+  opacity: 0.6;
+}
+
+.c-tooltip {
+  border-radius: 5px;
+  padding: 10px;
+  border: 1px solid #2055b6;
+  position: absolute;
+}

@@ -1,7 +1,9 @@
+import json
 from linebot import LineBotApi
 from linebot.models import *
 
 line_bot_api = LineBotApi('apQkyD5cnxa8kanS8yfnr+ExfDR/yUoKmLXVu7epNzWsXqIoD1twn/YCGRnhIZLv4r36JYsjzVlpfWMHHaoTs9V4d/somxpkAI0ZNpiG8axYMp+xMbVvcC5vwyKEGizJWZ4CK1KX5DFqVxe5mb5lPgdB04t89/1O/w1cDnyilFU=')
+
 """
 rich_menu_ref = []
 
@@ -36,7 +38,6 @@ for i in range(len(richmenus)):
 print(rich_menu_ref)
 """
 
-
 # with open("./media/SchoolMap00.png", 'rb') as f:
 #     line_bot_api.set_rich_menu_image('richmenu-a2cd665487fbfb8ed9a43ea01b329256', 'image/png', f)
 # with open("./media/SchoolMap01.png", 'rb') as f:
@@ -57,9 +58,13 @@ print(rich_menu_ref)
 #     line_bot_api.set_rich_menu_image('richmenu-2e19234a741692098e3972ba4bd34451', 'image/png', f)
 # with open("./media/SchoolMap09.png", 'rb') as f:
 #     line_bot_api.set_rich_menu_image('richmenu-ff85972065979651bcced6a651e554af', 'image/png', f)
+with open("./media/SchoolMapAreaNo.png", 'rb') as f:
+    line_bot_api.set_rich_menu_image('richmenu-f9f2e62cedbcf5cefa77e31d89aced35', 'image/png', f)
+
+
 
 # Set specific rich menu
-line_bot_api.link_rich_menu_to_user('Uf06239f6f01f24d5664045d8333ab49d', 'richmenu-ff85972065979651bcced6a651e554af')
+# line_bot_api.link_rich_menu_to_user('Uf06239f6f01f24d5664045d8333ab49d', 'richmenu-ff85972065979651bcced6a651e554af')
 
 # unlink to default rich menu
 # line_bot_api.unlink_rich_menu_from_user('Uf06239f6f01f24d5664045d8333ab49d')

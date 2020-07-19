@@ -1,108 +1,67 @@
 import ast
 
-
 def fetch(payload, db):
     payload = ast.literal_eval(payload)
     county = payload["county"]
-    ass_id = payload["assessment_id"]
-
-    # 開 DB
+    assessment_id = payload["assessment_id"]
 
     cur = db.conn.cursor()
-
-    # 從diana.db撈各個學校(schools)
-
-    cur.execute('SELECT * FROM schools WHERE county=%s ', (county,))
+    cur.execute("""SELECT s.id AS id, s.name AS school_name,
+                          s.county AS county, s.address AS address,
+                          s.latitude AS latitude, s.longitude AS longitude,
+                          c.name AS name, c.phone AS phone, c.id AS userid
+                   FROM schools AS s
+                   JOIN contacts AS c
+                      ON s.id = c.school_id
+                   WHERE s.county = %s;""", (county,))
     schools = cur.fetchall()
 
     data = {}
-
     for i in range(len(schools)):
         data[schools[i][1]] = {
+            "school_name": schools[i][1],
+            "school_id": schools[i][0],
             "county": schools[i][2],
             "address": schools[i][3],
-            "latitude": schools[i][4],
-            "longitude": schools[i][5],
-            "name": "",
-            "phone": "",
-            "userid": "",
-            "YN": 0,
-            "severity": 0
+            "latitude": str(schools[i][4]),
+            "longitude": str(schools[i][5]),
+            "name": schools[i][6],
+            "phone": schools[i][7],
+            "userid": schools[i][8],
         }
 
-    # 從diana.db撈聯絡人資料(contacts)
-    school_name = list(data.keys())
+        # calculate how many buildings have examined
+        cur.execute("""WITH answered AS (
+                           SELECT r.building_id, COUNT(r.yn) AS COUNT
+                           FROM responses AS r
+                           JOIN buildings AS b
+                              ON r.building_id = b.id
+                           WHERE assessment_id = %s AND b.school_id = %s
+                           GROUP BY r.building_id
+                        )
 
-    for i in range(len(school_name)):
-
-        cur.execute(
-            'SELECT * FROM contacts WHERE (county=%s AND school=%s) ',
-            (county, school_name[i]),
+                        SELECT CASE WHEN a.count IS NOT NULL THEN TRUE
+                                 ELSE FALSE END AS yn
+                        FROM buildings AS b
+                        JOIN schools AS s
+                           ON b.school_id = s.id
+                        FULL JOIN answered AS a
+                           ON b.id = a.building_id
+                        WHERE s.id = %s;"""
+                    % (assessment_id, schools[i][0], schools[i][0]),
         )
 
-        contacts = cur.fetchall()
+        ret = cur.fetchall()
+        total_building = len(ret)
+        checked_building = 0
+        for status in ret:
+            if status[0]: checked_building += 1
 
+        data[schools[i][1]]["YN"] = f"{checked_building}/{total_building}"
+        data[schools[i][1]]["severity"] = round(checked_building/total_building*100)
 
-        if len(contacts) > 0:
-            data[school_name[i]]["name"] = contacts[0][1]  # 塞聯絡人名字進去
-            data[school_name[i]]["phone"] = contacts[0][4]  # 塞手機進去
-            data[school_name[i]]["userid"] = contacts[0][0]  # 塞userid進去
-        else:
-            data[school_name[i]]["name"] = '無負責人'  # 塞聯絡人名字進去
-            data[school_name[i]]["phone"] = '無負責人'  # 塞手機進去
-            data[school_name[i]]["userid"] = '無負責人'  # 塞userid進去
 
     db.conn.commit()
-
-    # 從response.db看看他有沒有填過
-    # 從response.db撈特定事件答題過的人，填過就把YN改成1
-
-    cur.execute('SELECT * FROM responses WHERE assessment_id=%s ', (ass_id,))
-    response = cur.fetchall()
-
-    # 整理出以填答過的人，放進一個list
-
-    yitianda = []
-
-    for i in range(len(response)):
-        userid = response[i][2]
-        if userid not in yitianda:
-            yitianda.append(userid)
-    for i in range(len(data)):
-        if data[school_name[i]]["userid"] in yitianda:
-            data[school_name[i]]["YN"] = 1
-    db.conn.commit()
-
-    score = {}
-    for i in range(len(yitianda)):
-        cur.execute('SELECT * FROM responses WHERE assessment_id=%s AND userid=%s ', (ass_id, yitianda[i]))
-        sheet = cur.fetchall()
-        fenshu = 0
-        y_n = []
-
-        for j in range(len(sheet)):
-            y_n.append(sheet[j][0])
-
-        if 0 not in y_n:
-           fenshu = 100
-        elif 0 in y_n[0:64]:
-            for k in range(64):
-                if y_n[k] == 1:
-                    fenshu += 100/64
-        elif 0 in y_n[64:77]:
-            for k in range(64,77):
-                if y_n[k] == 1:
-                    fenshu += 100/13
-
-        fenshu = round(fenshu)
-        score[yitianda[i]] = fenshu
-        db.conn.commit()
-
-    for i in range(len(data)):
-        if data[school_name[i]]["userid"] in yitianda:
-            a = data[school_name[i]]["userid"]
-            data[school_name[i]]["severity"] = score[a]
 
     cur.close()
-
     return data

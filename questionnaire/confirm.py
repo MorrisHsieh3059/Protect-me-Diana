@@ -2,11 +2,8 @@ from linebot.models import (
     TemplateSendMessage, ConfirmTemplate, PostbackTemplateAction,
 )
 
-from .get_question_db import get_category             #DB抓問題
-
-
-def confirm(cat, i, db):
-    questions = get_category(cat, db)
+def confirm(cat, i, DB):
+    questions = DB.get_category(cat)
     #這裡i 不用 -= 1 是因為data[userid][cat]是從 0開始計算
     return   TemplateSendMessage(
                 alt_text='Confirm template',

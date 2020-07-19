@@ -2,7 +2,6 @@ from linebot.models import (
     TextSendMessage, StickerSendMessage,
     TemplateSendMessage, ConfirmTemplate, PostbackTemplateAction,
 )
-from .get_question_db import get_category
 
 def takeFirst(elem):
     return elem[0]
@@ -13,7 +12,7 @@ def tempview(output, db):
     output.sort(key=takeFirst)
 
     for cat, Q, value, pos, img_link in output:
-        questions = get_category(cat, db)
+        questions = db.get_category(cat)
 
         display = """題目：{} Q{}({})
 回覆：{}""".format(questions[Q-1][2], str(questions[Q-1][3]), questions[Q-1][1], value)
@@ -57,7 +56,7 @@ def tempview_confirm(output, db):
 
 def cat_tempview(cat, output, db):
 
-    questions = get_category(cat, db)
+    questions = db.get_category(cat)
     render = []
 
     output.sort(key=takeFirst)
