@@ -1,4 +1,5 @@
 import ast
+from chat_module.ner.demo import ner_sent
 
 def overall(payload, db):
     payload = ast.literal_eval(payload)
@@ -16,7 +17,8 @@ def overall(payload, db):
             # "check_ratio": 1,
             "checked_num": 0,
             "uncheck_num": 0,
-            "TBD": { "Quick": 0, "Normal": 0, "Indoors": 0, "Corridor": 0, "Outdoors": 0, }
+            "TBD": { "Quick": 0, "Normal": 0, "Indoors": 0, "Corridor": 0, "Outdoors": 0, },
+            "ner": {},
         }
 
         # 2. get schools
@@ -76,6 +78,45 @@ def overall(payload, db):
             data[county]["check_ratio"] = data[county]["checked_num"] / (data[county]["checked_num"] + data[county]["uncheck_num"])
         else:
             data[county]["check_ratio"] = 0
+
+        # 4. ner result
+        cur.execute("""SELECT r.description AS description
+                        FROM schools AS s
+                        JOIN buildings AS b
+                        ON s.id = b.school_id
+                        JOIN responses AS r
+                        ON b.id = r.building_id
+                        JOIN assessments AS a
+                        ON r.assessment_id = a.id
+                        JOIN questions AS q
+                        ON r.question_id = q.id
+                        WHERE yn IS FALSE AND assessment_id = %s AND county = %s;""",
+                        (assessment_id, county,)
+        )
+        query = cur.fetchall()
+
+        # Get all the products caught by ner
+        arr = []
+        for [x] in query:
+            dict = ner_sent(x)
+            for i in dict["product_name"]:
+                arr.append(i)
+
+        # Count the top three
+        times = []
+        for ent in arr:
+            temp = (ent, arr.count(ent),)
+            if temp not in times:
+                times.append(temp)
+                times.sort(key=lambda tup: tup[1])
+
+        # wrap
+        ner_ret = {}
+        for c in range(len(times)):
+            ner_ret[c+1] = times[c]
+
+        data[county]["ner"] = ner_ret
+
     cur.close()
     db.conn.commit()
     return data

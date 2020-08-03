@@ -29,7 +29,6 @@ def building(payload, db):
 
     ret = cur.fetchall()
     db.conn.commit()
-    print(ret)
 
     data = {}
     data["assessment_id"] = assessment_id

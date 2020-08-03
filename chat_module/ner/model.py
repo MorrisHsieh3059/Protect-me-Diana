@@ -13,9 +13,9 @@ class SharedModel:
     reuse = False
 
     def __init__(self, args, vocab_size):
-        self.embedding_size = args['embedding_size']
-        self.hidden_size = args['hidden_size']
-        self.dropout_rate = args['dropout']
+        self.embedding_size = args.embedding_size
+        self.hidden_size = args.hidden_size
+        self.dropout_rate = args.dropout
         self.vocab_size = vocab_size
         self.name = 'shared_part'
 
@@ -27,7 +27,7 @@ class SharedModel:
             self.sequence_lengths = tf.placeholder(dtype=tf.int32, shape=[None], name='sequence_lenth')
 
     def embedding_layer(self):
-        with tf.variable_scope("embedding", reuse=SharedModel.reuse), tf.device('/cpu:0'):
+        with tf.variable_scope("embedding"), tf.device('/cpu:0'):
             self._embedding = tf.get_variable(name='_embedding',
                                                shape=[self.vocab_size, self.embedding_size],
                                                trainable=False)
@@ -37,7 +37,7 @@ class SharedModel:
         self.embeddings = tf.nn.dropout(embedding, self.dropout_pl)
 
     def biLSTM_layer(self):
-        with tf.variable_scope("bi-lstm", reuse=SharedModel.reuse):
+        with tf.variable_scope("bi-lstm"):
             cell_fw = LSTMCell(self.hidden_size)
             cell_bw = LSTMCell(self.hidden_size)
             (output_fw_seq, output_bw_seq), _ = tf.nn.bidirectional_dynamic_rnn(
@@ -56,21 +56,21 @@ class SharedModel:
         self.add_placeholders()
         self.embedding_layer()
         self.biLSTM_layer()
-        SharedModel.reuse = tf.AUTO_REUSE
+        SharedModel.reuse = True
 
 class SpecModel():
     """ The Special part of each domain ner task """
 
     def __init__(self, args, num_tags, vocab_size, name):
         self.args = args
-        self.PROJ = args['PROJ']
-        self.embedding_size = args['embedding_size']
-        self.hidden_size = args['hidden_size']
+        self.PROJ = args.PROJ
+        self.embedding_size = args.embedding_size
+        self.hidden_size = args.hidden_size
         self.num_tags = num_tags
-        self.dropout_rate = args['dropout']
-        self.lr = args['lr']
-        self.grad_clip = args['grad_clip']
-        self.project_size = args['project_size']
+        self.dropout_rate = args.dropout
+        self.lr = args.lr
+        self.grad_clip = args.grad_clip
+        self.project_size = args.project_size
         self.vocab_size = vocab_size
         self.name = name
 
@@ -163,6 +163,8 @@ class SpecModel():
             self.train_op = self.optimizer.apply_gradients(grads_and_vars_clip, global_step=self.global_step)
 
     def build(self):
+        if len(tf.global_variables()) > 0: tf.compat.v1.reset_default_graph()
+
         self.shared_layer_op()
         self.get_shared_params()
         self.project_layer()

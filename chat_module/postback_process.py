@@ -91,7 +91,9 @@ def postback_process(userid, data, DB, event):
         if event.postback.data == 'edit=NO':
             data.set_user_status(userid, "00")
             output = data.get_user_feedback(userid)
+            print(f"\n\n\nAARRR!!!{output}\n\n\n")
             build, room = data.get_user_building(userid)
+            print(f"\n\n\nBBRRR!!!{(build, room)}\n\n\n")
             for feed in range(len(output)):
                 output[feed] += (build,)
                 output[feed] += (room,)

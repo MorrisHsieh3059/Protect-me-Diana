@@ -93,7 +93,7 @@ def text_process(text, userid, data, DB, event):
                 carousel_template = CarouselTemplate(columns=ct_container)
                 ret = [TemplateSendMessage(alt_text='問卷選單', template=carousel_template)]
 
-        elif user_data["status"] == "01" and "題已回覆" not in text:
+        elif user_data["status"] == "01" and ("題已回覆" not in text) and ('請簡述' not in text):
             #首次填答問卷選擇【待改進】
             print('進入【首次填答待改進】')
             cat = user_data["current"][0]
@@ -107,12 +107,7 @@ def text_process(text, userid, data, DB, event):
             else:
                 _ = (_[0], _[1], text,)
             data.set_user_current(userid, _)
-            data.add_user_feedback(userid, (cat, Q, text))
 
-            # ner check --------------------------------------------------------
-            # ent_q = questions_ent[cat][Q] # raw_text = DB.get_category(cat)[Q][1]
-            # ent_a = ner_sent(text)
-            # ent = ques_and_ans(ent_q, ent_a)
             ent = ner_sent(text)
             if not (len(ent["event"]) > 0 and len(ent["location"]) > 0 and len(ent["product_name"]) > 0):
                 complement = []
@@ -124,8 +119,8 @@ def text_process(text, userid, data, DB, event):
                     complement.append("物品名稱")
                 ret = ([TextSendMessage(text=f"請提供{complement}！")])
             else:
-                # --------------------------------------------------------------
                 # 請使用者點選問題所在位置
+                data.add_user_feedback(userid, (cat, Q, text))
                 floor = floor_plan()
                 ret = ([TextSendMessage(text='『' + text + '』已收到回覆')] + [TextSendMessage(text="請點選問題所在位置(九宮格)")] + [floor])
                 data.set_user_status(userid, "02") # 等待使用者戳點

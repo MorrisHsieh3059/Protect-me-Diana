@@ -36,6 +36,7 @@ from connect.detail import detail
 from connect.event import event
 from connect.building import building
 from connect.overall import overall
+# from connect.ner import ner
 
 from db.database import Database
 
@@ -74,6 +75,14 @@ def send_js(name):
 def overallroute():
     assessment_id = request.args.get('assessment_id')
     return jsonify(overall('{"assessment_id":' + assessment_id + '}', DB))
+
+"""
+@app.route('/ner')
+def nerroute():
+    county = request.args.get('county')
+    ass_id  = request.args.get('assessment_id')
+    return jsonify(ner('{"county":"' + county + '", "assessment_id":' + ass_id + '}', DB))
+"""
 
 @app.route('/event')
 def eventroute():
@@ -122,6 +131,7 @@ def handle_text_message(event):
 
     ret = text_process(text, userid, data, DB, event)
     if type(ret) != str:
+        print(f"text={text}")
         line_bot_api.reply_message(event.reply_token, ret)
     elif ret == "NA":
         print(f"text process did not process.\n    text = {text}")
